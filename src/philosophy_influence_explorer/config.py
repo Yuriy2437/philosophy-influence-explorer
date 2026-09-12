@@ -2,7 +2,7 @@
 
 from functools import lru_cache
 
-from pydantic import Field
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -29,18 +29,18 @@ class Settings(BaseSettings):
 
     neo4j_uri: str = "bolt://localhost:7687"
     neo4j_username: str = "neo4j"
-    neo4j_password: str = "change-me-before-production"
+    neo4j_password: SecretStr
     neo4j_database: str = "neo4j"
 
     llm_provider: str = "ollama"
     llm_model: str = ""
-    openai_api_key: str = ""
-    anthropic_api_key: str = ""
-    google_api_key: str = ""
+    openai_api_key: SecretStr | None = None
+    anthropic_api_key: SecretStr | None = None
+    google_api_key: SecretStr | None = None
     ollama_base_url: str = "http://localhost:11434"
 
     langsmith_tracing: bool = False
-    langsmith_api_key: str = ""
+    langsmith_api_key: SecretStr | None = None
     langsmith_project: str = "philosophy-influence-explorer"
 
     @property
