@@ -15,6 +15,7 @@ services:
       - neo4j_data:/data
       - neo4j_logs:/logs
       - neo4j_plugins:/plugins
+      - ./infra/neo4j/init:/import/init:ro
 
 volumes:
   neo4j_data:
