@@ -1,0 +1,4 @@
+id,philosopher_id,title,title_en,title_ru,title_de,original_language,publication_year,work_kind,is_translation,source_id,license_status,review_status
+work:cusanus:de-docta-ignorantia,philosopher:cusanus,De docta ignorantia,On Learned Ignorance,Об учёном незнании,De docta ignorantia,la,1440,primary_text,false,source:cusanus:opera-omnia-1932,source_text_verify,reviewed
+work:hegel:wissenschaft-der-logik,philosopher:hegel,Wissenschaft der Logik,Science of Logic,Наука логики,Wissenschaft der Logik,de,1812,primary_text,false,source:hegel:gutenberg-6729,public_domain_us,reviewed
+work:frank:nepostizhimoe,philosopher:frank,Непостижимое,The Unknowable,Непостижимое,Das Unergründliche,ru,1939,primary_text,false,source:frank:nepostizhimoe-bibliography,rights_to_verify,reviewed

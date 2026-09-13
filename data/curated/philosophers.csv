@@ -1,0 +1,4 @@
+id,canonical_name,name_en,name_ru,name_de,birth_year,death_year,bio_note,review_status
+philosopher:cusanus,Nicholas of Cusa,Nicholas of Cusa,Николай Кузанский,Nikolaus von Kues,1401,1464,"Cardinal, philosopher, theologian, and Renaissance thinker.",reviewed
+philosopher:hegel,Georg Wilhelm Friedrich Hegel,Georg Wilhelm Friedrich Hegel,Георг Вильгельм Фридрих Гегель,Georg Wilhelm Friedrich Hegel,1770,1831,"German idealist philosopher.",reviewed
+philosopher:frank,Semyon Frank,Semyon Frank,Семён Людвигович Франк,Semjon L. Frank,1877,1950,"Russian religious philosopher and historian of philosophy.",reviewed

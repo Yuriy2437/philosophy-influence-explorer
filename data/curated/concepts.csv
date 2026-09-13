@@ -1,0 +1,8 @@
+id,canonical_label,label_en,label_ru,label_de,description,concept_family,review_status
+concept:docta-ignorantia,docta ignorantia,learned ignorance,учёное незнание,gelehrte Unwissenheit,"Cusanus's account of knowing the limits of finite intellect in relation to the absolute.",epistemology,reviewed
+concept:coincidentia-oppositorum,coincidentia oppositorum,coincidence of opposites,совпадение противоположностей,Zusammenfall der Gegensätze,"A Cusan expression for the coincidence of maximum and minimum beyond discursive opposition.",metaphysics,reviewed
+concept:absolute,absolute,absolute,абсолют,das Absolute,"A cross-tradition concept whose meaning must be interpreted in a philosopher-specific context.",metaphysics,reviewed
+concept:being,being,being,бытие,Sein,"A central ontological category with philosopher-specific meanings.",ontology,reviewed
+concept:nothing,nothing,nothing,ничто,Nichts,"A central ontological category with philosopher-specific meanings.",ontology,reviewed
+concept:becoming,becoming,becoming,становление,Werden,"In Hegel's logic, the unity or inseparability of being and nothing.",dialectic,reviewed
+concept:unknowable,unknowable,the unknowable,непостижимое,das Unergründliche,"A controlled concept for Frank's philosophical treatment of reality beyond complete conceptual possession.",epistemology,reviewed

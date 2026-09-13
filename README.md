@@ -240,6 +240,20 @@ The seed script creates a deliberately small, curated graph for local developmen
 
 The seed graph is not a scholarly corpus. It exists to validate the data model, Neo4j integration, API contracts, and the future retrieval workflow.
 
+## Curated corpus workflow
+
+The repository contains a small multilingual starter corpus in `data/curated/`. It distinguishes primary quotations, editorial summaries, and bibliographic notes through explicit provenance fields.
+
+Validate and ingest the corpus:
+
+```bash
+uv run pytest
+docker compose up -d neo4j
+uv run python scripts/seed_curated_corpus.py
+```
+
+The corpus loader validates UTF-8 CSV files, stable IDs, references between files, passage provenance, and evidence requirements for conceptual relations before it writes to Neo4j.
+
 ## Repository layout
 
 ```text
@@ -282,8 +296,8 @@ Generated responses must cite corpus passages. If available evidence is insuffic
 - [x] Local Neo4j environment via Docker Compose.
 - [x] Version-controlled Neo4j schema and provenance-aware graph model.
 - [x] Python Neo4j client, database health endpoint, and curated seed graph.
-- [ ] Curated MVP corpus: Nicholas of Cusa, Hegel, Semyon Frank.
-- [ ] Ingestion pipeline, passages, metadata, and provenance.
+- [x] Curated multilingual MVP corpus with source and provenance metadata.
+- [x] Curated CSV validation and idempotent CSV-to-Neo4j ingestion.
 - [ ] Semantic/vector, full-text, and graph retrieval.
 - [ ] Source-grounded RAG responses.
 - [ ] LangGraph evidence-grade and query-rewrite workflow.

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RelationRecord",
+  "type": "object",
+  "required": [
+    "id",
+    "relation_type",
+    "from_id",
+    "to_id",
+    "properties_json",
+    "review_status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^relation:"
+    },
+    "relation_type": {
+      "type": "string",
+      "enum": ["WROTE", "HAS_PASSAGE", "DISCUSSES", "CONCEPTUALLY_RELATED_TO"]
+    },
+    "from_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "to_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "properties_json": {
+      "type": "string",
+      "minLength": 2
+    },
+    "review_status": {
+      "type": "string",
+      "enum": ["curated", "reviewed", "candidate", "rejected"]
+    }
+  },
+  "additionalProperties": false
+}

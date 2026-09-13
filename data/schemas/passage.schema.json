@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PassageRecord",
+  "type": "object",
+  "required": [
+    "id",
+    "work_id",
+    "source_id",
+    "language",
+    "text",
+    "text_kind",
+    "is_verbatim",
+    "is_machine_generated",
+    "is_editorial",
+    "position_label",
+    "section_order",
+    "citation_label",
+    "license_status",
+    "review_status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^passage:"
+    },
+    "work_id": {
+      "type": "string",
+      "pattern": "^work:"
+    },
+    "source_id": {
+      "type": "string",
+      "pattern": "^source:"
+    },
+    "language": {
+      "type": "string",
+      "enum": ["ru", "en", "de", "la"]
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "text_kind": {
+      "type": "string",
+      "enum": [
+        "primary_quote",
+        "editorial_summary",
+        "bibliographic_note",
+        "translation_reference"
+      ]
+    },
+    "is_verbatim": {
+      "type": "boolean"
+    },
+    "is_machine_generated": {
+      "type": "boolean"
+    },
+    "is_editorial": {
+      "type": "boolean"
+    },
+    "translation_of_passage_id": {
+      "type": "string"
+    },
+    "position_label": {
+      "type": "string",
+      "minLength": 1
+    },
+    "section_order": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "citation_label": {
+      "type": "string",
+      "minLength": 1
+    },
+    "license_status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "review_status": {
+      "type": "string",
+      "enum": ["curated", "reviewed", "candidate", "rejected"]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "text_kind": {
+            "const": "primary_quote"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "is_verbatim": {
+            "const": true
+          },
+          "is_editorial": {
+            "const": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "text_kind": {
+            "const": "editorial_summary"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "is_verbatim": {
+            "const": false
+          },
+          "is_editorial": {
+            "const": true
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}
