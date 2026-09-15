@@ -1,4 +1,4 @@
-"""Idempotent loader from curated CSV records into Neo4j."""
+"""Idempotent loader and scoped reset for curated CSV records in Neo4j."""
 
 from __future__ import annotations
 
@@ -10,6 +10,8 @@ from neo4j import Driver
 
 from philosophy_influence_explorer.ingestion.models import RelationRecord
 from philosophy_influence_explorer.ingestion.validators import validate_curated_corpus
+
+DATASET_ID = "curated_corpus_v1"
 
 NODE_LABELS = {
     "philosophers": "Philosopher",
@@ -32,14 +34,59 @@ def seed_curated_corpus(
         for collection_name, label in NODE_LABELS.items():
             merge_nodes(session, label, corpus[collection_name])
 
-        merge_work_authorship(session, corpus["works"])
         merge_passage_languages(session, corpus["passages"])
         merge_translation_links(session, corpus["passages"])
 
         for relation in corpus["relations"]:
             merge_relation(session, relation)
 
-    return {collection_name: len(records) for collection_name, records in corpus.items()}
+    return {
+        collection_name: len(records)
+        for collection_name, records in corpus.items()
+    }
+
+
+def reset_curated_corpus(driver: Driver, database: str) -> None:
+    """Delete only nodes and relationships owned by this curated corpus dataset.
+
+    The reset refuses to run when an external relationship points to a curated
+    node. This prevents the deletion of an edge owned by another dataset.
+    """
+    with driver.session(database=database) as session:
+        external_relationships = session.run(
+            """
+            MATCH (node {dataset: $dataset_id})-[relationship]-()
+            WHERE relationship.dataset IS NULL
+               OR relationship.dataset <> $dataset_id
+            RETURN count(relationship) AS count
+            """,
+            dataset_id=DATASET_ID,
+        ).single()["count"]
+
+        if external_relationships:
+            raise RuntimeError(
+                "Refusing to reset curated corpus because "
+                f"{external_relationships} external relationship(s) connect "
+                "to curated corpus nodes."
+            )
+
+        session.run(
+            """
+            MATCH ()-[relationship]->()
+            WHERE relationship.dataset = $dataset_id
+            DELETE relationship
+            """,
+            dataset_id=DATASET_ID,
+        ).consume()
+
+        session.run(
+            """
+            MATCH (node)
+            WHERE node.dataset = $dataset_id
+            DELETE node
+            """,
+            dataset_id=DATASET_ID,
+        ).consume()
 
 
 def merge_nodes(session: Any, label: str, records: Iterable[Any]) -> None:
@@ -47,31 +94,24 @@ def merge_nodes(session: Any, label: str, records: Iterable[Any]) -> None:
     query = f"""
     UNWIND $records AS record
     MERGE (node:{label} {{id: record.id}})
-    SET node += record
+    SET node += record,
+        node.dataset = $dataset_id
     """
 
-    payload = [record.model_dump(mode="json", exclude_none=True) for record in records]
-    session.run(query, records=payload).consume()
+    payload = [
+        record.model_dump(mode="json", exclude_none=True)
+        for record in records
+    ]
 
-
-def merge_work_authorship(session: Any, works: Iterable[Any]) -> None:
-    """Create authorship edges from philosopher_id stored on work records."""
-    query = """
-    UNWIND $works AS work
-    MATCH (philosopher:Philosopher {id: work.philosopher_id})
-    MATCH (written_work:Work {id: work.id})
-    MERGE (philosopher)-[relation:WROTE]->(written_work)
-    SET relation.role = "author",
-        relation.certainty = 1.0,
-        relation.review_status = work.review_status
-    """
-
-    payload = [work.model_dump(mode="json") for work in works]
-    session.run(query, works=payload).consume()
+    session.run(
+        query,
+        records=payload,
+        dataset_id=DATASET_ID,
+    ).consume()
 
 
 def merge_passage_languages(session: Any, passages: Iterable[Any]) -> None:
-    """Create Language nodes and language edges for each passage."""
+    """Create shared Language nodes and dataset-owned language edges."""
     query = """
     UNWIND $passages AS passage
     MERGE (language:Language {code: passage.language})
@@ -79,11 +119,20 @@ def merge_passage_languages(session: Any, passages: Iterable[Any]) -> None:
     WITH passage, language
     MATCH (passage_node:Passage {id: passage.id})
     MERGE (passage_node)-[relation:IN_LANGUAGE]->(language)
-    SET relation.status = "declared"
+    SET relation.status = "declared",
+        relation.dataset = $dataset_id
     """
 
-    payload = [passage.model_dump(mode="json", exclude_none=True) for passage in passages]
-    session.run(query, passages=payload).consume()
+    payload = [
+        passage.model_dump(mode="json", exclude_none=True)
+        for passage in passages
+    ]
+
+    session.run(
+        query,
+        passages=payload,
+        dataset_id=DATASET_ID,
+    ).consume()
 
 
 def merge_translation_links(session: Any, passages: Iterable[Any]) -> None:
@@ -94,15 +143,28 @@ def merge_translation_links(session: Any, passages: Iterable[Any]) -> None:
     WHERE passage.translation_of_passage_id IS NOT NULL
     MATCH (derived:Passage {id: passage.id})
     MATCH (original:Passage {id: passage.translation_of_passage_id})
-    MERGE (derived)-[relation:TRANSLATION_OF]->(original)
+    MERGE (derived)-[relation:TRANSLATION_OF {
+        id: "relation:" + passage.id
+            + ":translation-of:"
+            + passage.translation_of_passage_id
+    }]->(original)
     SET relation.status = CASE
         WHEN passage.text_kind = "editorial_summary" THEN "editorial_summary_of"
         ELSE "translation_reference_of"
-    END
+    END,
+        relation.dataset = $dataset_id
     """
 
-    payload = [passage.model_dump(mode="json", exclude_none=True) for passage in passages]
-    session.run(query, passages=payload).consume()
+    payload = [
+        passage.model_dump(mode="json", exclude_none=True)
+        for passage in passages
+    ]
+
+    session.run(
+        query,
+        passages=payload,
+        dataset_id=DATASET_ID,
+    ).consume()
 
 
 def merge_relation(session: Any, relation: RelationRecord) -> None:
@@ -112,7 +174,8 @@ def merge_relation(session: Any, relation: RelationRecord) -> None:
     MATCH (target {{id: $to_id}})
     MERGE (source)-[edge:{relation.relation_type.value} {{id: $id}}]->(target)
     SET edge += $properties,
-        edge.review_status = $review_status
+        edge.review_status = $review_status,
+        edge.dataset = $dataset_id
     """
 
     session.run(
@@ -122,4 +185,5 @@ def merge_relation(session: Any, relation: RelationRecord) -> None:
         to_id=relation.to_id,
         properties=relation.properties,
         review_status=relation.review_status.value,
+        dataset_id=DATASET_ID,
     ).consume()
