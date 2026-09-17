@@ -39,6 +39,11 @@ class Settings(BaseSettings):
     google_api_key: SecretStr | None = None
     ollama_base_url: str = "http://localhost:11434"
 
+    embedding_provider: str = "ollama"
+    embedding_model: str = "bge-m3:567m"
+    embedding_dimensions: int = Field(default=1024, ge=1)
+    embedding_timeout_seconds: float = Field(default=60.0, gt=0)
+
     langsmith_tracing: bool = False
     langsmith_api_key: SecretStr | None = None
     langsmith_project: str = "philosophy-influence-explorer"
