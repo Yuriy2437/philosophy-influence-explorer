@@ -43,6 +43,7 @@ class Settings(BaseSettings):
     embedding_model: str = "bge-m3:567m"
     embedding_dimensions: int = Field(default=1024, ge=1)
     embedding_timeout_seconds: float = Field(default=60.0, gt=0)
+    embedding_batch_size: int = Field(default=4, ge=1, le=100)
 
     langsmith_tracing: bool = False
     langsmith_api_key: SecretStr | None = None
