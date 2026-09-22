@@ -65,6 +65,7 @@ def create_app() -> FastAPI:
             "health": f"{settings.api_v1_prefix}/health",
             "database_health": f"{settings.api_v1_prefix}/health/database",
             "graph_summary": f"{settings.api_v1_prefix}/health/database/summary",
+            "passage_search": f"{settings.api_v1_prefix}/passages/search",
         }
 
     return app

@@ -15,7 +15,9 @@ def test_root_returns_service_metadata() -> None:
     assert response.json()["docs"] == "/docs"
     assert response.json()["health"] == "/api/v1/health"
     assert response.json()["database_health"] == "/api/v1/health/database"
-    assert response.json()["graph_summary"] == "/api/v1/health/database/summary"
+    assert response.json()[
+        "graph_summary"] == "/api/v1/health/database/summary"
+    assert response.json()["passage_search"] == "/api/v1/passages/search"
 
 
 def test_health_endpoint_returns_expected_contract() -> None:
