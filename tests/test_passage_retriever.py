@@ -16,6 +16,7 @@ from philosophy_influence_explorer.retrieval.passage_indexer import (
     PASSAGE_EMBEDDING_INDEX,
 )
 from philosophy_influence_explorer.retrieval.passage_retriever import (
+    PassageSearchFilters,
     PassageRetriever,
 )
 
@@ -81,38 +82,41 @@ class FakeClient:
         yield self.fake_session
 
 
-def test_search_embeds_query_and_returns_ranked_passages() -> None:
-    """Search should bind vector-index parameters and map Neo4j rows."""
-    client = FakeClient(
-        [
+def _record(
+    *,
+    id: str = "passage:hegel:wl:being:en",
+    concepts: list[dict[str, str]] | None = None,
+) -> dict[str, object]:
+    """Build one schema-aligned fake Neo4j row."""
+    return {
+        "id": id,
+        "text": "Becoming unites being and nothing.",
+        "score": 0.92134,
+        "source_id": "source:project-editorial",
+        "work_id": "work:hegel:wissenschaft-der-logik",
+        "citation_label": "Editorial summary of Wissenschaft der Logik",
+        "language": "en",
+        "text_kind": "editorial_summary",
+        "is_verbatim": False,
+        "is_editorial": True,
+        "is_machine_generated": False,
+        "concepts": concepts
+        or [
             {
-                "id": "passage:kants-autonomy",
-                "text": "Autonomy is the ground of moral obligation.",
-                "score": 0.92134,
-                "source_id": "source:kant:groundwork",
-                "work_id": "work:kants-groundwork",
-                "citation_label": "Groundwork, 4:440",
-                "language": "en",
-                "text_kind": "editorial_summary",
-                "is_verbatim": False,
-                "is_editorial": True,
-                "is_machine_generated": False,
-            },
-            {
-                "id": "passage:mill-liberty",
-                "text": "Individual liberty has broad social value.",
-                "score": 0.81234,
-                "source_id": "source:mill:on-liberty",
-                "work_id": "work:mills-on-liberty",
-                "citation_label": "On Liberty, chapter 1",
-                "language": "en",
-                "text_kind": "editorial_summary",
-                "is_verbatim": False,
-                "is_editorial": True,
-                "is_machine_generated": False,
-            },
-        ]
-    )
+                "id": "concept:becoming",
+                "canonical_label": "becoming",
+                "concept_family": "dialectic",
+                "label_en": "becoming",
+                "label_ru": "становление",
+                "label_de": "Werden",
+            }
+        ],
+    }
+
+
+def test_search_returns_passages_with_graph_concepts_and_filters() -> None:
+    """Search should map concept provenance and bind every optional filter."""
+    client = FakeClient([_record()])
     retriever = PassageRetriever(
         client=client,
         provider=FakeProvider(),
@@ -121,29 +125,30 @@ def test_search_embeds_query_and_returns_ranked_passages() -> None:
     passages = retriever.search(
         "  freedom and morality  ",
         limit=2,
+        filters=PassageSearchFilters(
+            concept_family="  dialectic  ",
+            language=" en ",
+            is_verbatim=False,
+            is_editorial=True,
+        ),
     )
 
     assert [(passage.id, passage.score) for passage in passages] == [
-        ("passage:kants-autonomy", 0.92134),
-        ("passage:mill-liberty", 0.81234),
+        ("passage:hegel:wl:being:en", 0.92134),
     ]
-    assert passages[0].work_id == "work:kants-groundwork"
-    assert passages[0].citation_label == "Groundwork, 4:440"
-    assert passages[1].source_id == "source:mill:on-liberty"
-    assert passages[1].is_editorial is True
+    assert passages[0].concepts[0].canonical_label == "becoming"
+    assert passages[0].concepts[0].concept_family == "dialectic"
+    assert passages[0].concepts[0].label_ru == "становление"
 
     assert len(client.fake_session.calls) == 1
     query, parameters = client.fake_session.calls[0]
 
     assert "db.index.vector.queryNodes" in query
-    assert "node.dataset = $dataset_id" in query
-    assert "node.embedding_model = $model" in query
-    assert "node.source_id AS source_id" in query
-    assert "node.work_id AS work_id" in query
-    assert "node.citation_label AS citation_label" in query
-    assert "node.author AS author" not in query
-    assert "node.source AS source" not in query
-    assert "node.work AS work" not in query
+    assert "(node)-[:DISCUSSES]->(concept:Concept" in query
+    assert "$concept_family IS NULL" in query
+    assert "node.language = $language" in query
+    assert "node.is_verbatim = $is_verbatim" in query
+    assert "node.is_editorial = $is_editorial" in query
     assert parameters == {
         "index_name": PASSAGE_EMBEDDING_INDEX,
         "candidate_limit": 8,
@@ -152,8 +157,30 @@ def test_search_embeds_query_and_returns_ranked_passages() -> None:
         "provider": "fake",
         "model": "fake-model",
         "dimensions": 3,
+        "language": "en",
+        "is_verbatim": False,
+        "is_editorial": True,
+        "concept_family": "dialectic",
         "limit": 2,
     }
+
+
+def test_search_uses_absent_filters_by_default() -> None:
+    """Unfiltered search should bind None for every optional filter."""
+    client = FakeClient([_record()])
+    retriever = PassageRetriever(
+        client=client,
+        provider=FakeProvider(),
+    )
+
+    passages = retriever.search("freedom and morality")
+
+    assert len(passages) == 1
+    _, parameters = client.fake_session.calls[0]
+    assert parameters["language"] is None
+    assert parameters["is_verbatim"] is None
+    assert parameters["is_editorial"] is None
+    assert parameters["concept_family"] is None
 
 
 @pytest.mark.parametrize(

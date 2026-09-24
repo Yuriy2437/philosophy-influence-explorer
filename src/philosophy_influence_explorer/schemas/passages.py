@@ -5,6 +5,17 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 
+class PassageConceptResponse(BaseModel):
+    """One Concept directly discussed by a semantic search result."""
+
+    id: str
+    canonical_label: str
+    concept_family: str
+    label_en: str
+    label_ru: str
+    label_de: str
+
+
 class PassageSearchResult(BaseModel):
     """One semantically retrieved passage returned by the public API."""
 
@@ -19,6 +30,7 @@ class PassageSearchResult(BaseModel):
     is_verbatim: bool
     is_editorial: bool
     is_machine_generated: bool
+    concepts: list[PassageConceptResponse]
 
 
 class PassageSearchResponse(BaseModel):

@@ -1,4 +1,4 @@
-"""API tests for semantic Passage retrieval."""
+"""API tests for concept-aware semantic Passage retrieval."""
 
 from __future__ import annotations
 
@@ -10,11 +10,26 @@ from philosophy_influence_explorer.api.dependencies import (
     get_passage_retriever,
 )
 from philosophy_influence_explorer.main import create_app
+from philosophy_influence_explorer.retrieval.passage_retriever import (
+    PassageSearchFilters,
+)
+
+
+@dataclass(frozen=True)
+class FakePassageConcept:
+    """Minimal Concept data matching the API route's read contract."""
+
+    id: str
+    canonical_label: str
+    concept_family: str
+    label_en: str
+    label_ru: str
+    label_de: str
 
 
 @dataclass(frozen=True)
 class FakeRetrievedPassage:
-    """A minimal passage object matching the route's read contract."""
+    """Minimal Passage data matching the API route's read contract."""
 
     id: str
     text: str
@@ -27,6 +42,7 @@ class FakeRetrievedPassage:
     is_verbatim: bool
     is_editorial: bool
     is_machine_generated: bool
+    concepts: tuple[FakePassageConcept, ...]
 
 
 class FakePassageRetriever:
@@ -39,16 +55,23 @@ class FakePassageRetriever:
     ) -> None:
         self.passages = passages or []
         self.error = error
-        self.calls: list[tuple[str, int]] = []
+        self.calls: list[tuple[str, int, PassageSearchFilters]] = []
 
     def search(
         self,
         query_text: str,
         *,
         limit: int = 5,
+        filters: PassageSearchFilters | None = None,
     ) -> list[FakeRetrievedPassage]:
-        """Capture the request and return configured results or an error."""
-        self.calls.append((query_text, limit))
+        """Capture request parameters and return configured results or error."""
+        self.calls.append(
+            (
+                query_text,
+                limit,
+                filters or PassageSearchFilters(),
+            )
+        )
 
         if self.error is not None:
             raise self.error
@@ -57,31 +80,42 @@ class FakePassageRetriever:
 
 
 def make_client(retriever: FakePassageRetriever) -> TestClient:
-    """Create an app client whose semantic-retrieval dependency is overridden."""
+    """Create an app client with its retriever dependency overridden."""
     app = create_app()
     app.dependency_overrides[get_passage_retriever] = lambda: retriever
     return TestClient(app)
 
 
-def test_search_returns_schema_aligned_semantic_results() -> None:
-    """The endpoint should serialize the retriever's provenanced results."""
-    retriever = FakePassageRetriever(
-        passages=[
-            FakeRetrievedPassage(
-                id="passage:hegel:wl:being:en",
-                text="Becoming unites being and nothing.",
-                score=0.8767,
-                source_id="source:project-editorial",
-                work_id="work:hegel:wissenschaft-der-logik",
-                citation_label="Editorial summary of Wissenschaft der Logik",
-                language="en",
-                text_kind="editorial_summary",
-                is_verbatim=False,
-                is_editorial=True,
-                is_machine_generated=False,
-            )
-        ]
+def _passage() -> FakeRetrievedPassage:
+    """Build one complete fake API result."""
+    return FakeRetrievedPassage(
+        id="passage:hegel:wl:being:en",
+        text="Becoming unites being and nothing.",
+        score=0.8767,
+        source_id="source:project-editorial",
+        work_id="work:hegel:wissenschaft-der-logik",
+        citation_label="Editorial summary of Wissenschaft der Logik",
+        language="en",
+        text_kind="editorial_summary",
+        is_verbatim=False,
+        is_editorial=True,
+        is_machine_generated=False,
+        concepts=(
+            FakePassageConcept(
+                id="concept:becoming",
+                canonical_label="becoming",
+                concept_family="dialectic",
+                label_en="becoming",
+                label_ru="становление",
+                label_de="Werden",
+            ),
+        ),
     )
+
+
+def test_search_returns_results_concepts_and_filters() -> None:
+    """Endpoint should serialize concepts and bind all optional filters."""
+    retriever = FakePassageRetriever(passages=[_passage()])
 
     with make_client(retriever) as client:
         response = client.get(
@@ -89,6 +123,10 @@ def test_search_returns_schema_aligned_semantic_results() -> None:
             params={
                 "q": "  being, nothing, and becoming  ",
                 "limit": 3,
+                "concept_family": " dialectic ",
+                "language": " en ",
+                "is_verbatim": "false",
+                "is_editorial": "true",
             },
         )
 
@@ -110,11 +148,51 @@ def test_search_returns_schema_aligned_semantic_results() -> None:
                 "is_verbatim": False,
                 "is_editorial": True,
                 "is_machine_generated": False,
+                "concepts": [
+                    {
+                        "id": "concept:becoming",
+                        "canonical_label": "becoming",
+                        "concept_family": "dialectic",
+                        "label_en": "becoming",
+                        "label_ru": "становление",
+                        "label_de": "Werden",
+                    }
+                ],
             }
         ],
     }
     assert retriever.calls == [
-        ("being, nothing, and becoming", 3)
+        (
+            "being, nothing, and becoming",
+            3,
+            PassageSearchFilters(
+                concept_family=" dialectic ",
+                language=" en ",
+                is_verbatim=False,
+                is_editorial=True,
+            ),
+        )
+    ]
+
+
+def test_search_allows_unfiltered_requests() -> None:
+    """Existing unfiltered calls should remain backwards compatible."""
+    retriever = FakePassageRetriever(passages=[])
+
+    with make_client(retriever) as client:
+        response = client.get(
+            "/api/v1/passages/search",
+            params={"q": "being"},
+        )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "query": "being",
+        "count": 0,
+        "results": [],
+    }
+    assert retriever.calls == [
+        ("being", 5, PassageSearchFilters())
     ]
 
 
@@ -136,7 +214,7 @@ def test_search_rejects_a_whitespace_only_query() -> None:
 
 
 def test_search_rejects_an_invalid_limit_before_retrieval() -> None:
-    """FastAPI validation should reject limits outside the endpoint contract."""
+    """FastAPI validation should reject out-of-range limits."""
     retriever = FakePassageRetriever()
 
     with make_client(retriever) as client:
@@ -150,7 +228,7 @@ def test_search_rejects_an_invalid_limit_before_retrieval() -> None:
 
 
 def test_search_maps_provider_or_database_failures_to_503() -> None:
-    """Infrastructure retrieval failures should not expose internals."""
+    """Infrastructure failures should not expose internal details."""
     retriever = FakePassageRetriever(
         error=RuntimeError("Ollama timed out while embedding query."),
     )
@@ -165,4 +243,6 @@ def test_search_maps_provider_or_database_failures_to_503() -> None:
     assert response.json() == {
         "detail": "Semantic search service is temporarily unavailable."
     }
-    assert retriever.calls == [("being", 5)]
+    assert retriever.calls == [
+        ("being", 5, PassageSearchFilters())
+    ]

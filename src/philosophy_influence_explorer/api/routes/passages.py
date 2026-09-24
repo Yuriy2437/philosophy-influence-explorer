@@ -11,9 +11,11 @@ from philosophy_influence_explorer.api.dependencies import (
     get_passage_retriever,
 )
 from philosophy_influence_explorer.retrieval.passage_retriever import (
+    PassageSearchFilters,
     PassageRetriever,
 )
 from philosophy_influence_explorer.schemas.passages import (
+    PassageConceptResponse,
     PassageSearchResponse,
     PassageSearchResult,
 )
@@ -46,8 +48,45 @@ async def search_passages(
             description="Maximum number of passages to return.",
         ),
     ] = 5,
+    concept_family: Annotated[
+        str | None,
+        Query(
+            description=(
+                "Restrict results to passages that discuss a Concept in "
+                "this family, for example: dialectic, epistemology, "
+                "metaphysics, or ontology."
+            ),
+        ),
+    ] = None,
+    language: Annotated[
+        str | None,
+        Query(
+            description=(
+                "Restrict results by Passage language code, for example: "
+                "en, ru, de, or la."
+            ),
+        ),
+    ] = None,
+    is_verbatim: Annotated[
+        bool | None,
+        Query(
+            description=(
+                "Restrict results to verbatim primary texts (true) or "
+                "non-verbatim project material (false)."
+            ),
+        ),
+    ] = None,
+    is_editorial: Annotated[
+        bool | None,
+        Query(
+            description=(
+                "Restrict results to editorial material (true) or "
+                "non-editorial material (false)."
+            ),
+        ),
+    ] = None,
 ) -> JSONResponse:
-    """Embed a query and retrieve the most similar curated passages."""
+    """Embed a query and retrieve filtered curated passages."""
     normalized_query = q.strip()
 
     if not normalized_query:
@@ -56,10 +95,18 @@ async def search_passages(
             detail="Query parameter 'q' must not be blank.",
         )
 
+    filters = PassageSearchFilters(
+        concept_family=concept_family,
+        language=language,
+        is_verbatim=is_verbatim,
+        is_editorial=is_editorial,
+    )
+
     try:
         passages = retriever.search(
             normalized_query,
             limit=limit,
+            filters=filters,
         )
     except ValueError as error:
         raise HTTPException(
@@ -85,6 +132,17 @@ async def search_passages(
             is_verbatim=passage.is_verbatim,
             is_editorial=passage.is_editorial,
             is_machine_generated=passage.is_machine_generated,
+            concepts=[
+                PassageConceptResponse(
+                    id=concept.id,
+                    canonical_label=concept.canonical_label,
+                    concept_family=concept.concept_family,
+                    label_en=concept.label_en,
+                    label_ru=concept.label_ru,
+                    label_de=concept.label_de,
+                )
+                for concept in passage.concepts
+            ],
         )
         for passage in passages
     ]
