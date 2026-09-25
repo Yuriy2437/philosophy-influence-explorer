@@ -5,9 +5,13 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from philosophy_influence_explorer import __version__
 from philosophy_influence_explorer.api.router import api_router
+from philosophy_influence_explorer.api.routes.search_page import (
+    router as search_page_router,
+)
 from philosophy_influence_explorer.config import get_settings
 from philosophy_influence_explorer.graph.neo4j_client import Neo4jClient
 
@@ -45,6 +49,14 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
+    app.mount(
+        "/static",
+        StaticFiles(
+            directory="src/philosophy_influence_explorer/static",
+        ),
+        name="static",
+    )
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list,
@@ -54,6 +66,7 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(api_router, prefix=settings.api_v1_prefix)
+    app.include_router(search_page_router)
 
     @app.get("/", tags=["service"])
     async def root() -> dict[str, str]:
@@ -66,6 +79,7 @@ def create_app() -> FastAPI:
             "database_health": f"{settings.api_v1_prefix}/health/database",
             "graph_summary": f"{settings.api_v1_prefix}/health/database/summary",
             "passage_search": f"{settings.api_v1_prefix}/passages/search",
+            "search_ui": "/search",
         }
 
     return app
