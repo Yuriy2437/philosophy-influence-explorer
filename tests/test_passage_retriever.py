@@ -97,6 +97,7 @@ def _record(
         "citation_label": "Editorial summary of Wissenschaft der Logik",
         "language": "en",
         "text_kind": "editorial_summary",
+        "review_status": "reviewed",
         "is_verbatim": False,
         "is_editorial": True,
         "is_machine_generated": False,
@@ -136,6 +137,7 @@ def test_search_returns_passages_with_graph_concepts_and_filters() -> None:
     assert [(passage.id, passage.score) for passage in passages] == [
         ("passage:hegel:wl:being:en", 0.92134),
     ]
+    assert passages[0].review_status == "reviewed"
     assert passages[0].concepts[0].canonical_label == "becoming"
     assert passages[0].concepts[0].concept_family == "dialectic"
     assert passages[0].concepts[0].label_ru == "становление"
@@ -149,6 +151,7 @@ def test_search_returns_passages_with_graph_concepts_and_filters() -> None:
     assert "node.language = $language" in query
     assert "node.is_verbatim = $is_verbatim" in query
     assert "node.is_editorial = $is_editorial" in query
+    assert "node.review_status AS review_status" in query
     assert parameters == {
         "index_name": PASSAGE_EMBEDDING_INDEX,
         "candidate_limit": 8,

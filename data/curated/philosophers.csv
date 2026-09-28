@@ -2,3 +2,5 @@ id,canonical_name,name_en,name_ru,name_de,birth_year,death_year,bio_note,review_
 philosopher:cusanus,Nicholas of Cusa,Nicholas of Cusa,Николай Кузанский,Nikolaus von Kues,1401,1464,"Cardinal, philosopher, theologian, and Renaissance thinker.",reviewed
 philosopher:hegel,Georg Wilhelm Friedrich Hegel,Georg Wilhelm Friedrich Hegel,Георг Вильгельм Фридрих Гегель,Georg Wilhelm Friedrich Hegel,1770,1831,"German idealist philosopher.",reviewed
 philosopher:frank,Semyon Frank,Semyon Frank,Семён Людвигович Франк,Semjon L. Frank,1877,1950,"Russian religious philosopher and historian of philosophy.",reviewed
+philosopher:kant,Immanuel Kant,Immanuel Kant,Иммануил Кант,Immanuel Kant,1724,1804,German philosopher; author of the Groundwork of the Metaphysics of Morals.,candidate
+philosopher:mill,John Stuart Mill,John Stuart Mill,Джон Стюарт Милль,John Stuart Mill,1806,1873,British philosopher; author of On Liberty.,candidate

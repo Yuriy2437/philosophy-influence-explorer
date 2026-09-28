@@ -129,6 +129,7 @@ async def search_passages(
             citation_label=passage.citation_label,
             language=passage.language,
             text_kind=passage.text_kind,
+            review_status=passage.review_status,
             is_verbatim=passage.is_verbatim,
             is_editorial=passage.is_editorial,
             is_machine_generated=passage.is_machine_generated,

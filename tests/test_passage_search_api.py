@@ -39,6 +39,7 @@ class FakeRetrievedPassage:
     citation_label: str
     language: str
     text_kind: str
+    review_status: str
     is_verbatim: bool
     is_editorial: bool
     is_machine_generated: bool
@@ -97,6 +98,7 @@ def _passage() -> FakeRetrievedPassage:
         citation_label="Editorial summary of Wissenschaft der Logik",
         language="en",
         text_kind="editorial_summary",
+        review_status="candidate",
         is_verbatim=False,
         is_editorial=True,
         is_machine_generated=False,
@@ -145,6 +147,7 @@ def test_search_returns_results_concepts_and_filters() -> None:
                 "citation_label": "Editorial summary of Wissenschaft der Logik",
                 "language": "en",
                 "text_kind": "editorial_summary",
+                "review_status": "candidate",
                 "is_verbatim": False,
                 "is_editorial": True,
                 "is_machine_generated": False,

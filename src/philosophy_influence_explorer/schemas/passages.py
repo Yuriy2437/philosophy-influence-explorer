@@ -27,6 +27,7 @@ class PassageSearchResult(BaseModel):
     citation_label: str
     language: str
     text_kind: str
+    review_status: str
     is_verbatim: bool
     is_editorial: bool
     is_machine_generated: bool

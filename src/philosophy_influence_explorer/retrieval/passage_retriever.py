@@ -57,6 +57,7 @@ class RetrievedPassage:
     citation_label: str
     language: str
     text_kind: str
+    review_status: str
     is_verbatim: bool
     is_editorial: bool
     is_machine_generated: bool
@@ -164,6 +165,7 @@ class PassageRetriever:
                node.citation_label AS citation_label,
                node.language AS language,
                node.text_kind AS text_kind,
+               node.review_status AS review_status,
                node.is_verbatim AS is_verbatim,
                node.is_editorial AS is_editorial,
                node.is_machine_generated AS is_machine_generated,
@@ -207,6 +209,7 @@ class PassageRetriever:
                 citation_label=record["citation_label"],
                 language=record["language"],
                 text_kind=record["text_kind"],
+                review_status=record["review_status"],
                 is_verbatim=record["is_verbatim"],
                 is_editorial=record["is_editorial"],
                 is_machine_generated=record["is_machine_generated"],

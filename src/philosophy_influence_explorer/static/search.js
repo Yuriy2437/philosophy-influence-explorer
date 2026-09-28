@@ -135,7 +135,11 @@ function createResultCard(passage) {
       passage.is_editorial ? 'Editorial material' : 'Non-editorial',
       passage.is_editorial ? 'editorial' : 'primary'
     ),
-    createBadge(passage.language.toUpperCase(), 'language')
+    createBadge(passage.language.toUpperCase(), 'language'),
+    createBadge(
+      `Review: ${passage.review_status}`,
+      passage.review_status === 'candidate' ? 'candidate' : 'reviewed'
+    )
   );
 
   const text = document.createElement('p');

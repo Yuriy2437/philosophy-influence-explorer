@@ -236,6 +236,16 @@ input:focus-visible {
   color: #4f3671;
 }
 
+.badge.candidate {
+  background: #fbe0df;
+  color: #84231e;
+}
+
+.badge.reviewed {
+  background: #e5e8ed;
+  color: #374151;
+}
+
 .passage-text {
   margin: 1rem 0;
   font-size: 1.05rem;

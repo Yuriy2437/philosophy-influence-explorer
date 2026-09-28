@@ -6,3 +6,10 @@ concept:being,being,being,бытие,Sein,"A central ontological category with p
 concept:nothing,nothing,nothing,ничто,Nichts,"A central ontological category with philosopher-specific meanings.",ontology,reviewed
 concept:becoming,becoming,becoming,становление,Werden,"In Hegel's logic, the unity or inseparability of being and nothing.",dialectic,reviewed
 concept:unknowable,unknowable,the unknowable,непостижимое,das Unergründliche,"A controlled concept for Frank's philosophical treatment of reality beyond complete conceptual possession.",epistemology,reviewed
+concept:autonomy,autonomy,autonomy,автономия,Autonomie,The will considered as giving law to itself in Kant's Groundwork.,ethics,candidate
+concept:moral-law,moral law,moral law,моральный закон,moralisches Gesetz,The universal-law aspect of Kant's account of moral willing.,ethics,candidate
+concept:humanity,humanity,humanity,человечество,Menschheit,Humanity as named in Kant's practical imperative; not a synonym for biological species alone.,ethics,candidate
+concept:end-in-itself,end in itself,end in itself,цель сама по себе,Zweck an sich selbst,The end-status Kant ascribes to humanity in the practical imperative.,ethics,candidate
+concept:liberty,liberty,liberty,свобода,Freiheit,Individual liberty as treated in Mill's On Liberty.,political_philosophy,candidate
+concept:harm-principle,harm principle,harm principle,принцип вреда,Schadensprinzip,Editorial label for Mill's criterion of preventing harm to others.,political_philosophy,candidate
+concept:individuality,individuality,individuality,индивидуальность,Individualität,Cultivation and development of individuality in Mill's On Liberty.,political_philosophy,candidate

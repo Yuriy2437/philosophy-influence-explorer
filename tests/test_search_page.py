@@ -14,6 +14,8 @@ def test_search_page_returns_html_shell_without_retrieval() -> None:
     assert response.headers["content-type"].startswith("text/html")
     assert "Concept-aware semantic search" in response.text
     assert 'id="search-form"' in response.text
+    assert 'value="ethics"' in response.text
+    assert 'value="political_philosophy"' in response.text
     assert "/static/search.css" in response.text
     assert "/static/search.js" in response.text
     assert "/api/v1/passages/search" not in response.text
@@ -29,3 +31,4 @@ def test_search_static_assets_are_served() -> None:
     assert "page-shell" in css_response.text
     assert javascript_response.status_code == 200
     assert "URLSearchParams" in javascript_response.text
+    assert "passage.review_status" in javascript_response.text

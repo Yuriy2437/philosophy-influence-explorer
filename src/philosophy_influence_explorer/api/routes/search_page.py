@@ -48,6 +48,8 @@ _SEARCH_PAGE = """<!doctype html>
               <option value="epistemology">Epistemology</option>
               <option value="metaphysics">Metaphysics</option>
               <option value="ontology">Ontology</option>
+              <option value="ethics">Ethics</option>
+              <option value="political_philosophy">Political philosophy</option>
             </select>
           </div>
 
