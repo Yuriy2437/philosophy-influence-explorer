@@ -44,12 +44,6 @@ _SEARCH_PAGE = """<!doctype html>
             <label for="concept-family">Concept family</label>
             <select id="concept-family" name="concept_family">
               <option value="">Any concept family</option>
-              <option value="dialectic">Dialectic</option>
-              <option value="epistemology">Epistemology</option>
-              <option value="metaphysics">Metaphysics</option>
-              <option value="ontology">Ontology</option>
-              <option value="ethics">Ethics</option>
-              <option value="political_philosophy">Political philosophy</option>
             </select>
           </div>
 

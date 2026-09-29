@@ -8,6 +8,8 @@ const limitInput = document.querySelector('#limit');
 const statusElement = document.querySelector('#status');
 const resultsElement = document.querySelector('#results');
 
+void loadConceptFamilies();
+
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
 
@@ -189,4 +191,43 @@ function createProvenanceRow(label, value) {
 
   row.append(term, description);
   return row;
+}
+
+async function loadConceptFamilies() {
+  const previousValue = conceptFamilyInput.value;
+
+  try {
+    const response = await fetch('/api/v1/concepts/families', {
+      headers: { Accept: 'application/json' },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const payload = await response.json();
+
+    if (
+      !Array.isArray(payload.families) ||
+      !payload.families.every(
+        (family) => typeof family === 'string' && family.length > 0
+      )
+    ) {
+      throw new Error('Invalid concept families response');
+    }
+
+    const anyOption = new Option('Any concept family', '');
+    const familyOptions = payload.families.map(
+      (family) => new Option(family.replaceAll('_', ' '), family)
+    );
+
+    conceptFamilyInput.replaceChildren(anyOption, ...familyOptions);
+
+    if (payload.families.includes(previousValue)) {
+      conceptFamilyInput.value = previousValue;
+    }
+  } catch (error) {
+    console.error('Could not load concept families:', error);
+    // Оставляем существующие options: поиск продолжит работать.
+  }
 }
