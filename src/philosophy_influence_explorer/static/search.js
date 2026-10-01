@@ -25,36 +25,42 @@ form.addEventListener('submit', async (event) => {
     limit: limitInput.value,
   });
 
-  addOptionalParameter(
-    searchParameters,
-    'concept_family',
-    conceptFamilyInput.value
-  );
-  addOptionalParameter(searchParameters, 'language', languageInput.value);
+  const searchBody = {
+    q: query,
+    limit: Number(limitInput.value),
+  };
+
+  if (conceptFamilyInput.value) {
+    searchBody.concept_family = conceptFamilyInput.value;
+  }
+
+  if (languageInput.value) {
+    searchBody.language = languageInput.value;
+  }
 
   const materialKind = form.elements.material_kind.value;
 
   if (materialKind === 'primary') {
-    searchParameters.set('is_verbatim', 'true');
-    searchParameters.set('is_editorial', 'false');
+    searchBody.is_verbatim = true;
+    searchBody.is_editorial = false;
   }
 
   if (materialKind === 'editorial') {
-    searchParameters.set('is_verbatim', 'false');
-    searchParameters.set('is_editorial', 'true');
+    searchBody.is_verbatim = false;
+    searchBody.is_editorial = true;
   }
 
   setLoadingState();
 
   try {
-    const response = await fetch(
-      `/api/v1/passages/search?${searchParameters.toString()}`,
-      {
-        headers: {
-          Accept: 'application/json',
-        },
-      }
-    );
+    const response = await fetch('/api/v1/passages/search', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(searchBody),
+    });
 
     const payload = await response.json();
 
@@ -69,12 +75,6 @@ form.addEventListener('submit', async (event) => {
     renderError(error.message);
   }
 });
-
-function addOptionalParameter(parameters, key, value) {
-  if (value) {
-    parameters.set(key, value);
-  }
-}
 
 function setLoadingState() {
   statusElement.className = 'status';

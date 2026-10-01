@@ -249,3 +249,133 @@ def test_search_maps_provider_or_database_failures_to_503() -> None:
     assert retriever.calls == [
         ("being", 5, PassageSearchFilters())
     ]
+
+
+def test_post_search_returns_results_and_binds_filters() -> None:
+    """POST should return the same result contract without a query in the URL."""
+    retriever = FakePassageRetriever(passages=[_passage()])
+
+    with make_client(retriever) as client:
+        response = client.post(
+            "/api/v1/passages/search",
+            json={
+                "q": "  being, nothing, and becoming  ",
+                "limit": 3,
+                "concept_family": " dialectic ",
+                "language": " en ",
+                "is_verbatim": False,
+                "is_editorial": True,
+            },
+        )
+
+    assert response.status_code == 200
+    assert response.request.method == "POST"
+    assert "q=" not in str(response.request.url)
+    assert response.headers["content-type"] == "application/json; charset=utf-8"
+
+    payload = response.json()
+    assert payload["query"] == "being, nothing, and becoming"
+    assert payload["count"] == 1
+    assert payload["results"][0]["id"] == "passage:hegel:wl:being:en"
+    assert payload["results"][0]["review_status"] == "candidate"
+    assert payload["results"][0]["concepts"][0]["concept_family"] == "dialectic"
+
+    assert retriever.calls == [
+        (
+            "being, nothing, and becoming",
+            3,
+            PassageSearchFilters(
+                concept_family=" dialectic ",
+                language=" en ",
+                is_verbatim=False,
+                is_editorial=True,
+            ),
+        )
+    ]
+
+
+def test_post_search_uses_defaults() -> None:
+    """POST without optional fields should use the existing search defaults."""
+    retriever = FakePassageRetriever()
+
+    with make_client(retriever) as client:
+        response = client.post(
+            "/api/v1/passages/search",
+            json={"q": "being"},
+        )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "query": "being",
+        "count": 0,
+        "results": [],
+    }
+    assert retriever.calls == [
+        ("being", 5, PassageSearchFilters())
+    ]
+
+
+def test_post_search_rejects_whitespace_only_query() -> None:
+    """A blank POST query must not reach the retriever."""
+    retriever = FakePassageRetriever()
+
+    with make_client(retriever) as client:
+        response = client.post(
+            "/api/v1/passages/search",
+            json={"q": "   "},
+        )
+
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "Query parameter 'q' must not be blank."
+    }
+    assert retriever.calls == []
+
+
+def test_post_search_rejects_invalid_limit() -> None:
+    """Request-body validation should reject out-of-range limits."""
+    retriever = FakePassageRetriever()
+
+    with make_client(retriever) as client:
+        response = client.post(
+            "/api/v1/passages/search",
+            json={"q": "being", "limit": 21},
+        )
+
+    assert response.status_code == 422
+    assert retriever.calls == []
+
+
+def test_post_search_rejects_overlong_query() -> None:
+    """The public POST contract limits query length before retrieval."""
+    retriever = FakePassageRetriever()
+
+    with make_client(retriever) as client:
+        response = client.post(
+            "/api/v1/passages/search",
+            json={"q": "a" * 501},
+        )
+
+    assert response.status_code == 422
+    assert retriever.calls == []
+
+
+def test_post_search_maps_retriever_failure_to_503() -> None:
+    """POST should use the existing infrastructure-error handling."""
+    retriever = FakePassageRetriever(
+        error=RuntimeError("Embedding provider unavailable"),
+    )
+
+    with make_client(retriever) as client:
+        response = client.post(
+            "/api/v1/passages/search",
+            json={"q": "being"},
+        )
+
+    assert response.status_code == 503
+    assert response.json() == {
+        "detail": "Semantic search service is temporarily unavailable."
+    }
+    assert retriever.calls == [
+        ("being", 5, PassageSearchFilters())
+    ]

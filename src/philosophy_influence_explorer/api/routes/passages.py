@@ -20,7 +20,18 @@ from philosophy_influence_explorer.schemas.passages import (
     PassageSearchResult,
 )
 
+from pydantic import BaseModel, Field
+
 router = APIRouter(prefix="/passages", tags=["passages"])
+
+
+class PassageSearchRequest(BaseModel):
+    q: str = Field(min_length=1, max_length=500)
+    limit: int = Field(default=5, ge=1, le=20)
+    concept_family: str | None = None
+    language: str | None = None
+    is_verbatim: bool | None = None
+    is_editorial: bool | None = None
 
 
 @router.get(
@@ -157,4 +168,25 @@ async def search_passages(
     return JSONResponse(
         content=payload.model_dump(),
         media_type="application/json; charset=utf-8",
+    )
+
+
+@router.post(
+    "/search",
+    response_model=PassageSearchResponse,
+    summary="Search curated passages without putting the query in the URL",
+)
+async def search_passages_post(
+    body: PassageSearchRequest,
+    retriever: Annotated[PassageRetriever, Depends(get_passage_retriever)],
+) -> JSONResponse:
+    """Use the existing search path for a validated JSON request body."""
+    return await search_passages(
+        q=body.q,
+        retriever=retriever,
+        limit=body.limit,
+        concept_family=body.concept_family,
+        language=body.language,
+        is_verbatim=body.is_verbatim,
+        is_editorial=body.is_editorial,
     )

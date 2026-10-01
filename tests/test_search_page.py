@@ -35,6 +35,7 @@ def test_search_static_assets_are_served() -> None:
     assert css_response.status_code == 200
     assert "page-shell" in css_response.text
     assert javascript_response.status_code == 200
-    assert "URLSearchParams" in javascript_response.text
+    assert "JSON.stringify(searchBody)" in javascript_response.text
+    assert "method: 'POST'" in javascript_response.text
     assert "/api/v1/concepts/families" in javascript_response.text
     assert "passage.review_status" in javascript_response.text
