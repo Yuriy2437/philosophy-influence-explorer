@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
 
 from philosophy_influence_explorer.api.dependencies import (
     get_passage_retriever,
@@ -20,12 +21,12 @@ from philosophy_influence_explorer.schemas.passages import (
     PassageSearchResult,
 )
 
-from pydantic import BaseModel, Field
-
 router = APIRouter(prefix="/passages", tags=["passages"])
 
 
 class PassageSearchRequest(BaseModel):
+    """Validated JSON body for passage search."""
+
     q: str = Field(min_length=1, max_length=500)
     limit: int = Field(default=5, ge=1, le=20)
     concept_family: str | None = None
@@ -37,9 +38,10 @@ class PassageSearchRequest(BaseModel):
 @router.get(
     "/search",
     response_model=PassageSearchResponse,
-    summary="Search curated passages by semantic similarity",
+    summary="Search curated passages by semantic similarity (legacy GET)",
 )
 async def search_passages(
+    request: Request,
     q: Annotated[
         str,
         Query(
@@ -97,7 +99,60 @@ async def search_passages(
         ),
     ] = None,
 ) -> JSONResponse:
-    """Embed a query and retrieve filtered curated passages."""
+    """Keep GET available in development but require POST elsewhere."""
+    if not request.app.state.allow_legacy_get_search:
+        raise HTTPException(
+            status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+            detail="Use POST for passage search.",
+            headers={"Allow": "POST"},
+        )
+
+    return _run_passage_search(
+        q=q,
+        retriever=retriever,
+        limit=limit,
+        concept_family=concept_family,
+        language=language,
+        is_verbatim=is_verbatim,
+        is_editorial=is_editorial,
+    )
+
+
+@router.post(
+    "/search",
+    response_model=PassageSearchResponse,
+    summary="Search curated passages without putting the query in the URL",
+)
+async def search_passages_post(
+    body: PassageSearchRequest,
+    retriever: Annotated[
+        PassageRetriever,
+        Depends(get_passage_retriever),
+    ],
+) -> JSONResponse:
+    """Search using a validated JSON request body."""
+    return _run_passage_search(
+        q=body.q,
+        retriever=retriever,
+        limit=body.limit,
+        concept_family=body.concept_family,
+        language=body.language,
+        is_verbatim=body.is_verbatim,
+        is_editorial=body.is_editorial,
+    )
+
+
+def _run_passage_search(
+    *,
+    q: str,
+    retriever: PassageRetriever,
+    limit: int,
+    concept_family: str | None,
+    language: str | None,
+    is_verbatim: bool | None,
+    is_editorial: bool | None,
+) -> JSONResponse:
+    """Run the common retrieval and response-serialization path."""
     normalized_query = q.strip()
 
     if not normalized_query:
@@ -168,25 +223,4 @@ async def search_passages(
     return JSONResponse(
         content=payload.model_dump(),
         media_type="application/json; charset=utf-8",
-    )
-
-
-@router.post(
-    "/search",
-    response_model=PassageSearchResponse,
-    summary="Search curated passages without putting the query in the URL",
-)
-async def search_passages_post(
-    body: PassageSearchRequest,
-    retriever: Annotated[PassageRetriever, Depends(get_passage_retriever)],
-) -> JSONResponse:
-    """Use the existing search path for a validated JSON request body."""
-    return await search_passages(
-        q=body.q,
-        retriever=retriever,
-        limit=body.limit,
-        concept_family=body.concept_family,
-        language=body.language,
-        is_verbatim=body.is_verbatim,
-        is_editorial=body.is_editorial,
     )

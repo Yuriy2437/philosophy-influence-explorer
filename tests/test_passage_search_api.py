@@ -379,3 +379,34 @@ def test_post_search_maps_retriever_failure_to_503() -> None:
     assert retriever.calls == [
         ("being", 5, PassageSearchFilters())
     ]
+
+
+def test_legacy_get_can_be_disabled_without_disabling_post() -> None:
+    """Public-mode GET is rejected while POST remains available."""
+    retriever = FakePassageRetriever(passages=[_passage()])
+
+    with make_client(retriever) as client:
+        client.app.state.allow_legacy_get_search = False
+
+        get_response = client.get(
+            "/api/v1/passages/search",
+            params={"q": "being"},
+        )
+        post_response = client.post(
+            "/api/v1/passages/search",
+            json={"q": "being"},
+        )
+
+    assert get_response.status_code == 405
+    assert get_response.headers["allow"] == "POST"
+    assert get_response.json() == {
+        "detail": "Use POST for passage search."
+    }
+
+    assert post_response.status_code == 200
+    assert post_response.json()["count"] == 1
+
+    # GET must not call the retriever; the only call is from POST.
+    assert retriever.calls == [
+        ("being", 5, PassageSearchFilters())
+    ]

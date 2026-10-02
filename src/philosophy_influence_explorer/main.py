@@ -49,6 +49,11 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
+    # Legacy GET search is available only for local development.
+    app.state.allow_legacy_get_search = (
+        settings.app_env.strip().lower() == "development"
+    )
+
     app.mount(
         "/static",
         StaticFiles(
