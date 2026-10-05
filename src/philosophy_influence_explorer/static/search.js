@@ -64,6 +64,12 @@ form.addEventListener('submit', async (event) => {
 
     const payload = await response.json();
 
+    if (response.status === 429) {
+      throw new Error(
+        'Search is temporarily rate-limited. Please wait a moment and try again.'
+      );
+    }
+
     if (!response.ok) {
       throw new Error(
         payload.detail || 'The semantic search request could not be completed.'

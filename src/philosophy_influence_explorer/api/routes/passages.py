@@ -121,6 +121,11 @@ async def search_passages(
 @router.post(
     "/search",
     response_model=PassageSearchResponse,
+    responses={
+        status.HTTP_429_TOO_MANY_REQUESTS: {
+            "description": "Too Many Requests",
+        },
+    },
     summary="Search curated passages without putting the query in the URL",
 )
 async def search_passages_post(

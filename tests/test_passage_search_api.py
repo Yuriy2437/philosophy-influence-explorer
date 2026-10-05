@@ -410,3 +410,17 @@ def test_legacy_get_can_be_disabled_without_disabling_post() -> None:
     assert retriever.calls == [
         ("being", 5, PassageSearchFilters())
     ]
+
+
+def test_post_search_contract_documents_rate_limit_response() -> None:
+    """The public search endpoint advertises its platform-enforced 429 response."""
+    retriever = FakePassageRetriever()
+
+    with make_client(retriever) as client:
+        response = client.get("/openapi.json")
+
+    operation = response.json()["paths"]["/api/v1/passages/search"]["post"]
+
+    assert operation["responses"]["429"] == {
+        "description": "Too Many Requests"
+    }

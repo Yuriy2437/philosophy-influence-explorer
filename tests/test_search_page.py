@@ -39,3 +39,4 @@ def test_search_static_assets_are_served() -> None:
     assert "method: 'POST'" in javascript_response.text
     assert "/api/v1/concepts/families" in javascript_response.text
     assert "passage.review_status" in javascript_response.text
+    assert "temporarily rate-limited" in javascript_response.text
