@@ -2,6 +2,7 @@
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,6 +15,9 @@ from philosophy_influence_explorer.api.routes.search_page import (
 )
 from philosophy_influence_explorer.config import get_settings
 from philosophy_influence_explorer.graph.neo4j_client import Neo4jClient
+
+PACKAGE_DIR = Path(__file__).resolve().parent
+STATIC_DIR = PACKAGE_DIR / "static"
 
 
 @asynccontextmanager
@@ -56,9 +60,7 @@ def create_app() -> FastAPI:
 
     app.mount(
         "/static",
-        StaticFiles(
-            directory="src/philosophy_influence_explorer/static",
-        ),
+        StaticFiles(directory=STATIC_DIR),
         name="static",
     )
 
