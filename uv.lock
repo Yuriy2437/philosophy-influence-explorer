@@ -294,6 +294,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
+    { name = "httpx" },
     { name = "neo4j" },
     { name = "pydantic-settings" },
     { name = "uvicorn", extra = ["standard"] },
@@ -301,7 +302,6 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "httpx" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "ruff" },
@@ -310,6 +310,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.115,<1.0" },
+    { name = "httpx", specifier = ">=0.27,<1.0" },
     { name = "neo4j", specifier = ">=5.28,<6.0" },
     { name = "pydantic-settings", specifier = ">=2.6,<3.0" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.30,<1.0" },
@@ -317,7 +318,6 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "httpx", specifier = ">=0.27,<1.0" },
     { name = "pytest", specifier = ">=8.3,<9.0" },
     { name = "pytest-cov", specifier = ">=5.0,<7.0" },
     { name = "ruff", specifier = ">=0.8,<1.0" },
