@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fastapi import Request
+from fastapi import HTTPException, Request, status
 
 from philosophy_influence_explorer.config import get_settings
 from philosophy_influence_explorer.embeddings.factory import (
@@ -15,16 +15,25 @@ from philosophy_influence_explorer.retrieval.passage_retriever import (
 
 
 def get_neo4j_client(request: Request) -> Neo4jClient:
-    """Return the Neo4j client owned by the application lifespan."""
-    return request.app.state.neo4j_client
+    """Return the active client or report database unavailability."""
+    client = getattr(request.app.state, "neo4j_client", None)
+
+    if client is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Database service is unavailable.",
+        )
+
+    return client
 
 
 def get_passage_retriever(request: Request) -> PassageRetriever:
-    """Build a semantic Passage retriever for the active application."""
+    """Build a semantic retriever only when the database is available."""
+    client = get_neo4j_client(request)
     settings = get_settings()
     provider = create_embedding_provider(settings)
 
     return PassageRetriever(
-        client=get_neo4j_client(request),
+        client=client,
         provider=provider,
     )

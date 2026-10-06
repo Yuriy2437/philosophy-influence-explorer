@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
-from philosophy_influence_explorer.graph.neo4j_client import Neo4jClient
+from philosophy_influence_explorer.api.dependencies import get_neo4j_client
 
 router = APIRouter(prefix="/health/database", tags=["health"])
 
@@ -20,11 +20,6 @@ class GraphSummaryResponse(BaseModel):
 
     total_nodes: int
     total_relationships: int
-
-
-def get_neo4j_client(request: Request) -> Neo4jClient:
-    """Retrieve the application-owned Neo4j client."""
-    return request.app.state.neo4j_client
 
 
 @router.get("", response_model=DatabaseHealthResponse, summary="Check Neo4j connectivity")

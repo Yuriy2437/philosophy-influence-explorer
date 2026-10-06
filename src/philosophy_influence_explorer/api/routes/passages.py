@@ -12,8 +12,8 @@ from philosophy_influence_explorer.api.dependencies import (
     get_passage_retriever,
 )
 from philosophy_influence_explorer.retrieval.passage_retriever import (
-    PassageSearchFilters,
     PassageRetriever,
+    PassageSearchFilters,
 )
 from philosophy_influence_explorer.schemas.passages import (
     PassageConceptResponse,

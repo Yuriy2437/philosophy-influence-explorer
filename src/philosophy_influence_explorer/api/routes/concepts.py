@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException, Request, status
 from neo4j.exceptions import Neo4jError
 from pydantic import BaseModel
 
-from philosophy_influence_explorer.api.routes.database import get_neo4j_client
+from philosophy_influence_explorer.api.dependencies import get_neo4j_client
 
 router = APIRouter(prefix="/concepts", tags=["concepts"])
 

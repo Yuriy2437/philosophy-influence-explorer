@@ -123,7 +123,6 @@ def test_indexer_creates_index_loads_and_persists_embeddings() -> None:
     assert summary.skipped == 0
 
     queries = [query for query, _ in client.fake_session.calls]
-    parameters = [parameters for _, parameters in client.fake_session.calls]
 
     assert any(
         f"CREATE VECTOR INDEX {PASSAGE_EMBEDDING_INDEX} IF NOT EXISTS" in query

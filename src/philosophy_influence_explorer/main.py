@@ -22,17 +22,21 @@ STATIC_DIR = PACKAGE_DIR / "static"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """Create and close infrastructure clients with the app lifecycle."""
+    """Create and close enabled infrastructure clients."""
     settings = get_settings()
-    neo4j_client = Neo4jClient(settings)
+    neo4j_client: Neo4jClient | None = None
 
-    app.state.neo4j_client = neo4j_client
+    app.state.neo4j_client = None
     app.state.neo4j_database = settings.neo4j_database
 
     try:
+        if settings.neo4j_enabled:
+            neo4j_client = Neo4jClient(settings)
+            app.state.neo4j_client = neo4j_client
         yield
     finally:
-        neo4j_client.close()
+        if neo4j_client is not None:
+            neo4j_client.close()
 
 
 def create_app() -> FastAPI:

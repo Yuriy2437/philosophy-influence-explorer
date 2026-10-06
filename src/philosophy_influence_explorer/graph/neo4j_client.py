@@ -13,6 +13,11 @@ class Neo4jClient:
     """Small application wrapper around the official Neo4j Python driver."""
 
     def __init__(self, settings: Settings) -> None:
+        if not settings.neo4j_enabled:
+            raise ValueError("Neo4j is disabled.")
+
+        if settings.neo4j_password is None:
+            raise ValueError("Neo4j password is not configured.")
         self._database = settings.neo4j_database
         self._driver: Driver = GraphDatabase.driver(
             settings.neo4j_uri,
@@ -50,7 +55,8 @@ class Neo4jClient:
             with self.session() as session:
                 record = session.run(query).single()
         except Neo4jError as error:
-            raise RuntimeError("Unable to retrieve graph summary from Neo4j.") from error
+            raise RuntimeError(
+                "Unable to retrieve graph summary from Neo4j.") from error
 
         if record is None:
             return {"total_nodes": 0, "total_relationships": 0}

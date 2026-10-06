@@ -1,8 +1,9 @@
 """Application configuration loaded from environment variables."""
 
 from functools import lru_cache
+from typing import Self
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -27,9 +28,10 @@ class Settings(BaseSettings):
     host: str = "0.0.0.0"
     port: int = Field(default=8000, ge=1, le=65535)
 
+    neo4j_enabled: bool = True
     neo4j_uri: str = "bolt://localhost:7687"
     neo4j_username: str = "neo4j"
-    neo4j_password: SecretStr
+    neo4j_password: SecretStr | None = None
     neo4j_database: str = "neo4j"
 
     llm_provider: str = "ollama"
@@ -48,6 +50,19 @@ class Settings(BaseSettings):
     langsmith_tracing: bool = False
     langsmith_api_key: SecretStr | None = None
     langsmith_project: str = "philosophy-influence-explorer"
+
+    @model_validator(mode="after")
+    def validate_neo4j_configuration(self) -> Self:
+        """Require credentials only when Neo4j is enabled."""
+        if self.neo4j_enabled:
+            if (
+                self.neo4j_password is None
+                or not self.neo4j_password.get_secret_value().strip()
+            ):
+                raise ValueError(
+                    "NEO4J_PASSWORD is required when NEO4J_ENABLED=true."
+                )
+        return self
 
     @property
     def cors_origin_list(self) -> list[str]:

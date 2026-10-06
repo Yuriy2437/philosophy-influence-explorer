@@ -16,8 +16,8 @@ from philosophy_influence_explorer.retrieval.passage_indexer import (
     PASSAGE_EMBEDDING_INDEX,
 )
 from philosophy_influence_explorer.retrieval.passage_retriever import (
-    PassageSearchFilters,
     PassageRetriever,
+    PassageSearchFilters,
 )
 
 
