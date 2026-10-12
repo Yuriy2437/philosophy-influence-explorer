@@ -1,6 +1,7 @@
 """Database health and graph-summary endpoints."""
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, HTTPException, Request, status
+from neo4j.exceptions import DriverError, Neo4jError
 from pydantic import BaseModel
 
 from philosophy_influence_explorer.api.dependencies import get_neo4j_client
@@ -16,7 +17,7 @@ class DatabaseHealthResponse(BaseModel):
 
 
 class GraphSummaryResponse(BaseModel):
-    """Basic graph size information for local development."""
+    """Basic graph size information."""
 
     total_nodes: int
     total_relationships: int
@@ -26,8 +27,19 @@ class GraphSummaryResponse(BaseModel):
 async def database_health_check(request: Request) -> DatabaseHealthResponse:
     """Verify that the API can authenticate and connect to Neo4j."""
     client = get_neo4j_client(request)
-    client.verify_connectivity()
-    return DatabaseHealthResponse(status="ok", database=request.app.state.neo4j_database)
+
+    try:
+        client.verify_connectivity()
+    except (DriverError, Neo4jError) as error:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Database service is temporarily unavailable.",
+        ) from error
+
+    return DatabaseHealthResponse(
+        status="ok",
+        database=request.app.state.neo4j_database,
+    )
 
 
 @router.get(
@@ -38,4 +50,13 @@ async def database_health_check(request: Request) -> DatabaseHealthResponse:
 async def graph_summary(request: Request) -> GraphSummaryResponse:
     """Return total node and relationship counts in the current graph."""
     client = get_neo4j_client(request)
-    return GraphSummaryResponse(**client.get_graph_summary())
+
+    try:
+        summary = client.get_graph_summary()
+    except (DriverError, Neo4jError, RuntimeError) as error:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Graph summary is temporarily unavailable.",
+        ) from error
+
+    return GraphSummaryResponse(**summary)
