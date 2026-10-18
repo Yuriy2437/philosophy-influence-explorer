@@ -98,18 +98,20 @@ function renderResults(payload) {
   statusElement.className = 'status';
 
   if (payload.count === 0) {
-    statusElement.textContent = 'No passages matched the selected filters.';
+    statusElement.textContent =
+      'No passages were returned for this query and the selected filters.';
     const emptyState = document.createElement('p');
     emptyState.className = 'empty-state';
     emptyState.textContent =
-      'Try a broader query or remove one of the concept, language, or provenance filters.';
+      'This does not establish that the corpus contains no relevant passage. ' +
+      'Try rephrasing the query or broadening the concept, language, or provenance filters.';
     resultsElement.replaceChildren(emptyState);
     return;
   }
 
-  statusElement.textContent = `${payload.count} result${
+  statusElement.textContent = `${payload.count} retrieved passage${
     payload.count === 1 ? '' : 's'
-  } for “${payload.query}”.`;
+  } for “${payload.query}”. These are search matches, not a verified answer.`;
 
   const cards = payload.results.map(createResultCard);
   resultsElement.replaceChildren(...cards);
@@ -128,7 +130,10 @@ function createResultCard(passage) {
 
   const score = document.createElement('span');
   score.className = 'score';
-  score.textContent = `Similarity ${passage.score.toFixed(3)}`;
+  score.textContent = `Vector similarity ${passage.score.toFixed(3)}`;
+  score.title =
+    'Vector similarity is not a probability of truth or a measure of answer completeness.';
+  score.setAttribute('aria-describedby', 'similarity-guidance');
 
   header.append(title, score);
 

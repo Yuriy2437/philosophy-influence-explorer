@@ -23,7 +23,28 @@ _SEARCH_PAGE = """<!doctype html>
       <p class="hero-copy">
         Search the curated philosophical corpus by meaning, language,
         provenance, and graph concepts.
-      </p>
+           </p>
+      <aside
+        class="search-guidance"
+        aria-labelledby="search-guidance-heading"
+      >
+        <h2 id="search-guidance-heading">About these results</h2>
+        <p>
+          This search retrieves passages, not a generated or verified
+          answer. A passage may be related to your query without
+          answering it.
+        </p>
+        <p id="similarity-guidance">
+          Similarity scores rank vector matches. They are not
+          probabilities of truth or measures of answer completeness.
+        </p>
+        <p>
+          Primary quotation describes the recorded provenance, not
+          completed scholarly verification. Check the source, translation,
+          context, and review status. Candidate records still require
+          scholarly review.
+        </p>
+      </aside>
     </header>
 
     <section class="search-panel" aria-labelledby="search-heading">
