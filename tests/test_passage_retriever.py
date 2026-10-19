@@ -11,10 +11,7 @@ from philosophy_influence_explorer.embeddings.base import (
     EmbeddingModelInfo,
     EmbeddingProvider,
 )
-from philosophy_influence_explorer.retrieval.passage_indexer import (
-    DATASET_ID,
-    PASSAGE_EMBEDDING_INDEX,
-)
+from philosophy_influence_explorer.retrieval.passage_indexer import DATASET_ID
 from philosophy_influence_explorer.retrieval.passage_retriever import (
     PassageRetriever,
     PassageSearchFilters,
@@ -145,7 +142,16 @@ def test_search_returns_passages_with_graph_concepts_and_filters() -> None:
     assert len(client.fake_session.calls) == 1
     query, parameters = client.fake_session.calls[0]
 
-    assert "db.index.vector.queryNodes" in query
+    assert "MATCH (node:Passage)" in query
+    assert "node.embedding IS NOT NULL" in query
+    assert "vector.similarity.cosine(" in query
+    assert "db.index.vector.queryNodes" not in query
+    assert query.index("WHERE $concept_family IS NULL") < query.index(
+        "vector.similarity.cosine("
+    )
+    assert query.index("vector.similarity.cosine(") < query.index(
+        "LIMIT $limit"
+    )
     assert "(node)-[:DISCUSSES]->(concept:Concept" in query
     assert "$concept_family IS NULL" in query
     assert "node.language = $language" in query
@@ -153,8 +159,6 @@ def test_search_returns_passages_with_graph_concepts_and_filters() -> None:
     assert "node.is_editorial = $is_editorial" in query
     assert "node.review_status AS review_status" in query
     assert parameters == {
-        "index_name": PASSAGE_EMBEDDING_INDEX,
-        "candidate_limit": 8,
         "query_embedding": [0.1, 0.2, 0.3],
         "dataset_id": DATASET_ID,
         "provider": "fake",

@@ -8,10 +8,7 @@ from neo4j.exceptions import Neo4jError
 
 from philosophy_influence_explorer.embeddings.base import EmbeddingProvider
 from philosophy_influence_explorer.graph.neo4j_client import Neo4jClient
-from philosophy_influence_explorer.retrieval.passage_indexer import (
-    DATASET_ID,
-    PASSAGE_EMBEDDING_INDEX,
-)
+from philosophy_influence_explorer.retrieval.passage_indexer import DATASET_ID
 
 
 @dataclass(frozen=True)
@@ -83,7 +80,7 @@ class PassageRetriever:
         limit: int = 5,
         filters: PassageSearchFilters | None = None,
     ) -> list[RetrievedPassage]:
-        """Embed a query and return matching curated passages by similarity."""
+        """Embed a query and rank all eligible passages by cosine similarity."""
         normalized_query = query_text.strip()
 
         if not normalized_query:
@@ -109,13 +106,8 @@ class PassageRetriever:
             )
 
         cypher = """
-        CALL db.index.vector.queryNodes(
-            $index_name,
-            $candidate_limit,
-            $query_embedding
-        )
-        YIELD node, score
-        WHERE node:Passage
+        MATCH (node:Passage)
+        WHERE node.embedding IS NOT NULL
           AND node.dataset = $dataset_id
           AND node.embedding_provider = $provider
           AND node.embedding_model = $model
@@ -135,7 +127,7 @@ class PassageRetriever:
         OPTIONAL MATCH (node)-[:DISCUSSES]->(concept:Concept {
             dataset: $dataset_id
         })
-        WITH node, score, collect(
+        WITH node, collect(
             CASE
                 WHEN concept IS NULL THEN NULL
                 ELSE {
@@ -149,7 +141,6 @@ class PassageRetriever:
             END
         ) AS collected_concepts
         WITH node,
-             score,
              [concept IN collected_concepts WHERE concept IS NOT NULL]
                  AS concepts
         WHERE $concept_family IS NULL
@@ -157,6 +148,11 @@ class PassageRetriever:
                concept IN concepts
                WHERE concept.concept_family = $concept_family
            )
+        WITH node, concepts,
+             vector.similarity.cosine(
+                 node.embedding,
+                 $query_embedding
+             ) AS score
         RETURN node.id AS id,
                node.text AS text,
                score AS score,
@@ -174,14 +170,10 @@ class PassageRetriever:
         LIMIT $limit
         """
 
-        candidate_limit = max(limit * 4, limit)
-
         try:
             with self._client.session() as session:
                 result = session.run(
                     cypher,
-                    index_name=PASSAGE_EMBEDDING_INDEX,
-                    candidate_limit=candidate_limit,
                     query_embedding=query_embedding,
                     dataset_id=DATASET_ID,
                     provider=self._provider.model_info.provider,
