@@ -9,8 +9,14 @@ from philosophy_influence_explorer.embeddings.factory import (
     create_embedding_provider,
 )
 from philosophy_influence_explorer.graph.neo4j_client import Neo4jClient
+from philosophy_influence_explorer.retrieval.graph_context_retriever import (
+    GraphContextRetriever,
+)
 from philosophy_influence_explorer.retrieval.passage_retriever import (
     PassageRetriever,
+)
+from philosophy_influence_explorer.retrieval.semantic_graph_retriever import (
+    SemanticGraphRetriever,
 )
 
 
@@ -36,4 +42,21 @@ def get_passage_retriever(request: Request) -> PassageRetriever:
     return PassageRetriever(
         client=client,
         provider=provider,
+    )
+
+
+def get_semantic_graph_retriever(request: Request) -> SemanticGraphRetriever:
+    """Build the composed retriever from existing application services."""
+    try:
+        passage_retriever = get_passage_retriever(request)
+        client = get_neo4j_client(request)
+    except (ValueError, RuntimeError) as error:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Query retrieval service is temporarily unavailable.",
+        ) from error
+
+    return SemanticGraphRetriever(
+        passage_retriever=passage_retriever,
+        graph_context_retriever=GraphContextRetriever(client=client),
     )
