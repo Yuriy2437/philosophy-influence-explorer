@@ -82,6 +82,7 @@ _SEARCH_PAGE = """<!doctype html>
           <div>
             <label for="limit">Maximum results</label>
             <select id="limit" name="limit">
+              <option value="1">1</option>
               <option value="3">3</option>
               <option value="5" selected>5</option>
               <option value="10">10</option>

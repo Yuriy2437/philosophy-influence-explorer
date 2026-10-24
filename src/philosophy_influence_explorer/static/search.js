@@ -20,14 +20,10 @@ form.addEventListener('submit', async (event) => {
     return;
   }
 
-  const searchParameters = new URLSearchParams({
-    q: query,
-    limit: limitInput.value,
-  });
-
   const searchBody = {
     q: query,
     limit: Number(limitInput.value),
+    graph_limit: 20,
   };
 
   if (conceptFamilyInput.value) {
@@ -53,7 +49,7 @@ form.addEventListener('submit', async (event) => {
   setLoadingState();
 
   try {
-    const response = await fetch('/api/v1/passages/search', {
+    const response = await fetch('/api/v1/query', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -97,24 +93,169 @@ function renderError(message) {
 function renderResults(payload) {
   statusElement.className = 'status';
 
-  if (payload.count === 0) {
+  const passages = payload.semantic_passages;
+  const paths = payload.graph_context;
+
+  const semanticSection = createResultsSection(
+    'semantic-results-heading',
+    'Semantic matches'
+  );
+
+  if (passages.length === 0) {
     statusElement.textContent =
       'No passages were returned for this query and the selected filters.';
-    const emptyState = document.createElement('p');
-    emptyState.className = 'empty-state';
-    emptyState.textContent =
-      'This does not establish that the corpus contains no relevant passage. ' +
-      'Try rephrasing the query or broadening the concept, language, or provenance filters.';
-    resultsElement.replaceChildren(emptyState);
-    return;
+
+    semanticSection.append(
+      createEmptyState(
+        'This does not establish that the corpus contains no relevant passage. ' +
+          'Try rephrasing the query or broadening the concept, language, or provenance filters.'
+      )
+    );
+  } else {
+    statusElement.textContent = `${passages.length} retrieved passage${
+      passages.length === 1 ? '' : 's'
+    } for “${payload.query}”. These are search matches, not a verified answer.`;
+
+    semanticSection.append(...passages.map(createResultCard));
   }
 
-  statusElement.textContent = `${payload.count} retrieved passage${
-    payload.count === 1 ? '' : 's'
-  } for “${payload.query}”. These are search matches, not a verified answer.`;
+  const graphSection = createResultsSection(
+    'graph-context-heading',
+    'Graph context'
+  );
 
-  const cards = payload.results.map(createResultCard);
-  resultsElement.replaceChildren(...cards);
+  const guidance = document.createElement('p');
+  guidance.className = 'graph-guidance';
+  guidance.textContent =
+    'These paths connect passages through a shared recorded concept. ' +
+    'They do not establish historical influence or provide a verified answer. ' +
+    'Graph-derived passages have no vector similarity score in this section.';
+  graphSection.append(guidance);
+
+  if (paths.length === 0) {
+    graphSection.append(
+      createEmptyState(
+        'No graph paths were returned for this query. ' +
+          'This does not establish that no relevant connections exist.'
+      )
+    );
+  } else {
+    const semanticById = new Map(
+      passages.map((passage) => [passage.id, passage])
+    );
+    const grouped = new Map();
+
+    for (const path of paths) {
+      if (!grouped.has(path.passage.id)) {
+        grouped.set(path.passage.id, {
+          passage: path.passage,
+          paths: [],
+        });
+      }
+
+      grouped.get(path.passage.id).paths.push(path);
+    }
+
+    const additionalCount = [...grouped.keys()].filter(
+      (id) => !semanticById.has(id)
+    ).length;
+
+    const summary = document.createElement('p');
+    summary.className = 'graph-summary';
+    summary.textContent =
+      `${paths.length} returned graph path(s); ` +
+      `${grouped.size} distinct related passage(s), ` +
+      `${additionalCount} not already shown in semantic matches. ` +
+      'These are passage counts, not counts of distinct sources.';
+
+    graphSection.append(summary);
+
+    for (const group of grouped.values()) {
+      graphSection.append(createGraphCard(group, semanticById));
+    }
+  }
+
+  resultsElement.replaceChildren(semanticSection, graphSection);
+}
+
+function createResultsSection(id, headingText) {
+  const section = document.createElement('section');
+  section.className = 'result-section';
+  section.setAttribute('aria-labelledby', id);
+
+  const heading = document.createElement('h2');
+  heading.id = id;
+  heading.textContent = headingText;
+
+  section.append(heading);
+  return section;
+}
+
+function createEmptyState(message) {
+  const paragraph = document.createElement('p');
+  paragraph.className = 'empty-state';
+  paragraph.textContent = message;
+  return paragraph;
+}
+
+function createGraphCard(group, semanticById) {
+  const article = createResultCard(group.passage);
+  article.classList.add('graph-card');
+
+  const origin = document.createElement('p');
+  origin.className = 'graph-origin';
+  origin.textContent = semanticById.has(group.passage.id)
+    ? 'Already shown in semantic matches; not an additional passage.'
+    : 'Additional graph-derived passage; not a separately ranked vector match.';
+
+  const pathsHeading = document.createElement('h4');
+  pathsHeading.textContent = 'Recorded concept paths';
+
+  const pathList = document.createElement('ul');
+  pathList.className = 'graph-paths';
+
+  for (const path of group.paths) {
+    const item = document.createElement('li');
+    const seed = semanticById.get(path.seed_id);
+
+    const chain = document.createElement('p');
+    chain.className = 'graph-chain';
+    chain.textContent =
+      `${seed ? seed.citation_label || seed.id : path.seed_id} ` +
+      `→ ${path.seed_edge.relation_type} → ` +
+      `${path.concept.canonical_label} ` +
+      `← ${path.related_edge.relation_type} ← ` +
+      `${group.passage.citation_label || group.passage.id}`;
+
+    const details = document.createElement('dl');
+    details.className = 'provenance';
+    details.append(
+      createProvenanceRow('Seed passage ID', path.seed_id),
+      createProvenanceRow('Concept ID', path.concept.id),
+      createProvenanceRow('Concept family', path.concept.concept_family),
+      createProvenanceRow('Seed relation ID', path.seed_edge.id),
+      createProvenanceRow('Seed relation review', path.seed_edge.review_status),
+      createProvenanceRow(
+        'Seed relation extraction',
+        path.seed_edge.extraction_method ?? 'Not recorded'
+      ),
+      createProvenanceRow('Related relation ID', path.related_edge.id),
+      createProvenanceRow(
+        'Related relation review',
+        path.related_edge.review_status
+      ),
+      createProvenanceRow(
+        'Related relation extraction',
+        path.related_edge.extraction_method ?? 'Not recorded'
+      )
+    );
+
+    item.append(chain, details);
+    pathList.append(item);
+  }
+
+  article.append(origin, pathsHeading, pathList);
+  return article;
 }
 
 function createResultCard(passage) {
@@ -128,14 +269,18 @@ function createResultCard(passage) {
   title.className = 'result-title';
   title.textContent = passage.citation_label || passage.id;
 
-  const score = document.createElement('span');
-  score.className = 'score';
-  score.textContent = `Vector similarity ${passage.score.toFixed(3)}`;
-  score.title =
-    'Vector similarity is not a probability of truth or a measure of answer completeness.';
-  score.setAttribute('aria-describedby', 'similarity-guidance');
+  header.append(title);
 
-  header.append(title, score);
+  if (Number.isFinite(passage.score)) {
+    const score = document.createElement('span');
+    score.className = 'score';
+    score.textContent = `Vector similarity ${passage.score.toFixed(3)}`;
+    score.title =
+      'Vector similarity is not a probability of truth or a measure of answer completeness.';
+    score.setAttribute('aria-describedby', 'similarity-guidance');
+
+    header.append(score);
+  }
 
   const badges = document.createElement('div');
   badges.className = 'badges';
@@ -162,7 +307,7 @@ function createResultCard(passage) {
   const concepts = document.createElement('div');
   concepts.className = 'concepts';
 
-  for (const concept of passage.concepts) {
+  for (const concept of passage.concepts ?? []) {
     const conceptBadge = document.createElement('span');
     conceptBadge.className = 'concept-badge';
     conceptBadge.textContent = `${concept.concept_family} · ${concept.canonical_label}`;

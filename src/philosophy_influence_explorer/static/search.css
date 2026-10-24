@@ -321,3 +321,52 @@ input:focus-visible {
 .search-guidance p:last-child {
   margin-bottom: 0;
 }
+
+.result-section {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.result-section > h2 {
+  margin-bottom: 0;
+}
+
+.result-section + .result-section {
+  margin-top: 1.5rem;
+}
+
+.graph-guidance,
+.graph-summary,
+.graph-origin {
+  margin-bottom: 0;
+  color: #51483c;
+  font-family: Arial, sans-serif;
+  font-size: 0.9rem;
+}
+
+.graph-card {
+  border-left: 4px solid #80649b;
+}
+
+.graph-card h4 {
+  margin: 1.25rem 0 0.65rem;
+  font-family: Arial, sans-serif;
+  font-size: 0.95rem;
+}
+
+.graph-paths {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.graph-chain {
+  margin-bottom: 0.5rem;
+  overflow-wrap: anywhere;
+}
+
+.graph-paths .provenance {
+  margin: 0;
+}

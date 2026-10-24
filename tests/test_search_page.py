@@ -16,6 +16,7 @@ def test_search_page_returns_html_shell_without_retrieval() -> None:
     assert 'id="search-form"' in response.text
     assert 'id="concept-family"' in response.text
     assert '<option value="">Any concept family</option>' in response.text
+    assert '<option value="1">1</option>' in response.text
 
     # Concept families are loaded by JavaScript, not hardcoded in the HTML.
     assert 'value="ethics"' not in response.text
@@ -77,3 +78,39 @@ def test_search_javascript_contains_cautious_result_messages() -> None:
     assert "Vector similarity " in script
     assert "score.setAttribute('aria-describedby', 'similarity-guidance')" in script
     assert "No passages matched the selected filters." not in script
+
+
+def test_search_javascript_uses_query_api_and_separate_graph_context() -> None:
+    """The UI uses the combined endpoint and separates graph context."""
+    with TestClient(create_app()) as client:
+        response = client.get("/static/search.js")
+
+    assert response.status_code == 200
+    script = response.text
+
+    assert "fetch('/api/v1/query'" in script
+    assert "fetch('/api/v1/passages/search'" not in script
+    assert "graph_limit: 20" in script
+    assert "payload.semantic_passages" in script
+    assert "payload.graph_context" in script
+    assert "Semantic matches" in script
+    assert "Graph context" in script
+    assert "They do not establish historical influence" in script
+    assert "Graph-derived passages have no vector similarity score" in script
+
+
+def test_search_javascript_groups_graph_passages_and_guards_scores() -> None:
+    """The script contains grouping and graph-safe card rendering."""
+    with TestClient(create_app()) as client:
+        response = client.get("/static/search.js")
+
+    assert response.status_code == 200
+    script = response.text
+
+    assert "grouped.has(path.passage.id)" in script
+    assert "grouped.get(path.passage.id).paths.push(path)" in script
+    assert "Already shown in semantic matches; not an additional passage." in script
+    assert "not counts of distinct sources" in script
+    assert "Number.isFinite(passage.score)" in script
+    assert "passage.concepts ?? []" in script
+    assert "No graph paths were returned for this query." in script
