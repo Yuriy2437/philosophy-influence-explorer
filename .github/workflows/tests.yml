@@ -1,0 +1,62 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit-api:
+    name: Unit and API tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v9
+
+      - name: Install Python
+        run: uv python install 3.12
+
+      - name: Install locked dependencies
+        run: uv sync --locked --all-groups --python 3.12
+
+      - name: Run unit and API tests
+        run: uv run --no-sync python -m pytest tests -q
+
+  browser:
+    name: Chromium UI tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v9
+
+      - name: Install Python
+        run: uv python install 3.12
+
+      - name: Install locked dependencies
+        run: uv sync --locked --all-groups --python 3.12
+
+      - name: Check browser-test lint
+        run: uv run --no-sync python -m ruff check browser_tests
+
+      - name: Check browser-test formatting
+        run: uv run --no-sync python -m ruff format --check browser_tests
+
+      - name: Install Chromium and system dependencies
+        run: uv run --no-sync python -m playwright install --with-deps chromium
+
+      - name: Run browser tests
+        run: uv run --no-sync python -m pytest browser_tests -q --browser chromium
