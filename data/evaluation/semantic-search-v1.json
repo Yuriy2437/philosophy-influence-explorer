@@ -1,0 +1,208 @@
+{
+  "schema_version": 1,
+  "suite_id": "semantic-search-v1",
+  "description": "Historical semantic-search checks transcribed from the project protocol. Not an independent held-out benchmark.",
+  "source_document": "docs/search-quality-checks.md",
+  "historical_context": {
+    "evaluation_date": "2026-10-18",
+    "dataset_id": "curated_corpus_v1",
+    "reported_corpus_passages": 16,
+    "embedding_provider": "gemini",
+    "embedding_model": "gemini-embedding-001",
+    "embedding_dimensions": 768
+  },
+  "cases": [
+    {
+      "id": "q1",
+      "source_section": "5 / Q1",
+      "query": "Why should a person be treated as an end rather than merely as a means?",
+      "limit": 3,
+      "filters": {
+        "concept_family": null,
+        "language": null,
+        "is_verbatim": true,
+        "is_editorial": false
+      },
+      "expected_passage_id": "passage:kant:groundwork:2:humanity:en",
+      "historical_expected_rank": 1,
+      "historical_top_result_relevance": "partially_relevant",
+      "historical_direct_answer_in_top3": false
+    },
+    {
+      "id": "q2",
+      "source_section": "5 / Q2",
+      "query": "What does it mean for the will to give itself a universal law?",
+      "limit": 3,
+      "filters": {
+        "concept_family": null,
+        "language": null,
+        "is_verbatim": true,
+        "is_editorial": false
+      },
+      "expected_passage_id": "passage:kant:groundwork:2:autonomy:en",
+      "historical_expected_rank": 1,
+      "historical_top_result_relevance": "directly_relevant",
+      "historical_direct_answer_in_top3": true
+    },
+    {
+      "id": "q3",
+      "source_section": "5 / Q3",
+      "query": "When is it legitimate to exercise power over someone against their will?",
+      "limit": 3,
+      "filters": {
+        "concept_family": null,
+        "language": null,
+        "is_verbatim": true,
+        "is_editorial": false
+      },
+      "expected_passage_id": "passage:mill:on-liberty:1:harm:en",
+      "historical_expected_rank": 1,
+      "historical_top_result_relevance": "directly_relevant",
+      "historical_direct_answer_in_top3": true
+    },
+    {
+      "id": "q4",
+      "source_section": "5 / Q4",
+      "query": "How does the cultivation of individuality contribute to human development?",
+      "limit": 3,
+      "filters": {
+        "concept_family": null,
+        "language": null,
+        "is_verbatim": true,
+        "is_editorial": false
+      },
+      "expected_passage_id": "passage:mill:on-liberty:3:individuality:en",
+      "historical_expected_rank": 1,
+      "historical_top_result_relevance": "directly_relevant",
+      "historical_direct_answer_in_top3": true
+    },
+    {
+      "id": "q5",
+      "source_section": "5 / Q5",
+      "query": "How is becoming related to being and nothing?",
+      "limit": 3,
+      "filters": {
+        "concept_family": null,
+        "language": null,
+        "is_verbatim": true,
+        "is_editorial": false
+      },
+      "expected_passage_id": "passage:hegel:wl:being:de",
+      "historical_expected_rank": 1,
+      "historical_top_result_relevance": "directly_relevant",
+      "historical_direct_answer_in_top3": true
+    },
+    {
+      "id": "q6",
+      "source_section": "5 / Q6",
+      "query": "Почему бесконечное нельзя постичь через сравнение и пропорцию?",
+      "limit": 3,
+      "filters": {
+        "concept_family": null,
+        "language": null,
+        "is_verbatim": true,
+        "is_editorial": false
+      },
+      "expected_passage_id": "passage:cusanus:ddi:1.1:la",
+      "historical_expected_rank": 1,
+      "historical_top_result_relevance": "directly_relevant",
+      "historical_direct_answer_in_top3": true
+    },
+    {
+      "id": "paraphrase-p1",
+      "source_section": "6 / P1",
+      "query": "Как следует поступать с другим человеком, чтобы не превращать его лишь в инструмент своих целей?",
+      "limit": 3,
+      "filters": {
+        "concept_family": null,
+        "language": null,
+        "is_verbatim": true,
+        "is_editorial": false
+      },
+      "expected_passage_id": "passage:kant:groundwork:2:humanity:en",
+      "historical_expected_rank": 1,
+      "historical_top_result_relevance": "directly_relevant",
+      "historical_direct_answer_in_top3": true
+    },
+    {
+      "id": "paraphrase-p2",
+      "source_section": "6 / P2",
+      "query": "Is someone's own good enough to justify forcing them to act, or must other people be at risk?",
+      "limit": 3,
+      "filters": {
+        "concept_family": null,
+        "language": null,
+        "is_verbatim": true,
+        "is_editorial": false
+      },
+      "expected_passage_id": "passage:mill:on-liberty:1:harm:en",
+      "historical_expected_rank": 1,
+      "historical_top_result_relevance": "directly_relevant",
+      "historical_direct_answer_in_top3": true
+    },
+    {
+      "id": "paraphrase-p3",
+      "source_section": "6 / P3",
+      "query": "Как соотносятся абсолютный максимум и минимум?",
+      "limit": 3,
+      "filters": {
+        "concept_family": null,
+        "language": null,
+        "is_verbatim": true,
+        "is_editorial": false
+      },
+      "expected_passage_id": "passage:cusanus:ddi:1.4:la",
+      "historical_expected_rank": 1,
+      "historical_top_result_relevance": "directly_relevant",
+      "historical_direct_answer_in_top3": true
+    },
+    {
+      "id": "negative-n1",
+      "source_section": "6 / N1",
+      "query": "How does Kant distinguish a hypothetical imperative from a categorical imperative?",
+      "limit": 3,
+      "filters": {
+        "concept_family": null,
+        "language": null,
+        "is_verbatim": true,
+        "is_editorial": false
+      },
+      "expected_passage_id": null,
+      "historical_expected_rank": null,
+      "historical_top_result_relevance": "thematically_related",
+      "historical_direct_answer_in_top3": false
+    },
+    {
+      "id": "negative-n2",
+      "source_section": "6 / N2",
+      "query": "Какую роль играет труд в формировании самосознания в диалектике господина и раба?",
+      "limit": 3,
+      "filters": {
+        "concept_family": null,
+        "language": null,
+        "is_verbatim": true,
+        "is_editorial": false
+      },
+      "expected_passage_id": null,
+      "historical_expected_rank": null,
+      "historical_top_result_relevance": "thematically_related",
+      "historical_direct_answer_in_top3": false
+    },
+    {
+      "id": "negative-n3",
+      "source_section": "6 / N3",
+      "query": "What experimental evidence supports quantum entanglement?",
+      "limit": 3,
+      "filters": {
+        "concept_family": null,
+        "language": null,
+        "is_verbatim": true,
+        "is_editorial": false
+      },
+      "expected_passage_id": null,
+      "historical_expected_rank": null,
+      "historical_top_result_relevance": "irrelevant",
+      "historical_direct_answer_in_top3": false
+    }
+  ]
+}

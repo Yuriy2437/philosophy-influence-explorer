@@ -192,6 +192,8 @@ The workflow sets `NEO4J_ENABLED=false` so application imports do not require lo
 
 The first successful run of both jobs was confirmed on commit `3767446`.
 
+Semantic-search regression evaluation is documented in [Semantic search evaluation](docs/semantic-search-evaluation.md). Its autonomous tests run in CI; live retrieval evaluation is run separately with configured Neo4j and embedding services.
+
 ## API examples
 
 ### Application health

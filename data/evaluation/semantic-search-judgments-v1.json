@@ -1,0 +1,292 @@
+{
+  "schema_version": 1,
+  "suite_id": "semantic-search-v1",
+  "source_document": "docs/search-quality-checks.md",
+  "approval_date": "2026-10-18",
+  "annotation_method": "AI-assisted annotations approved by the project author; not an independent multi-expert evaluation.",
+  "scope": "Judgments apply to the historical query-passage pairs and passage texts described in the source protocol. Rationales are condensed from that protocol.",
+  "relevance_labels": [
+    "directly_relevant",
+    "partially_relevant",
+    "thematically_related",
+    "irrelevant"
+  ],
+  "cases": [
+    {
+      "case_id": "q1",
+      "judgments": [
+        {
+          "passage_id": "passage:kant:groundwork:2:humanity:en",
+          "historical_rank": 1,
+          "relevance": "partially_relevant",
+          "rationale": "Формулирует требование относиться к человечеству как к цели, но не представляет запрошенного обоснования: вопрос спрашивает «почему»."
+        },
+        {
+          "passage_id": "passage:mill:on-liberty:3:individuality:en",
+          "historical_rank": 2,
+          "relevance": "thematically_related",
+          "rationale": "Рассматривает развитие человека и ценность условий такого развития, но не обосновывает запрет обращения с человеком лишь как со средством."
+        },
+        {
+          "passage_id": "passage:mill:on-liberty:1:harm:en",
+          "historical_rank": 3,
+          "relevance": "thematically_related",
+          "rationale": "Ограничивает допустимое принуждение предотвращением вреда другим, но не раскрывает основание требования «человек как цель»."
+        }
+      ]
+    },
+    {
+      "case_id": "q2",
+      "judgments": [
+        {
+          "passage_id": "passage:kant:groundwork:2:autonomy:en",
+          "historical_rank": 1,
+          "relevance": "directly_relevant",
+          "rationale": "Определяет автономию как свойство воли быть законом для самой себя и связывает выбор максим со всеобщим законом."
+        },
+        {
+          "passage_id": "passage:kant:groundwork:2:humanity:en",
+          "historical_rank": 2,
+          "relevance": "thematically_related",
+          "rationale": "Формулирует требование обращаться с человечеством как с целью, но не объясняет самозаконодательство воли; связь требует дополнительного рассуждения."
+        },
+        {
+          "passage_id": "passage:mill:on-liberty:1:harm:en",
+          "historical_rank": 3,
+          "relevance": "thematically_related",
+          "rationale": "Рассматривает границы внешнего принуждения, но не объясняет, как воля даёт себе всеобщий закон."
+        }
+      ]
+    },
+    {
+      "case_id": "q3",
+      "judgments": [
+        {
+          "passage_id": "passage:mill:on-liberty:1:harm:en",
+          "historical_rank": 1,
+          "relevance": "directly_relevant",
+          "rationale": "Указывает основание допустимого принуждения — предотвращение вреда другим — в пределах области применения, указанной в цитате."
+        },
+        {
+          "passage_id": "passage:kant:groundwork:2:autonomy:en",
+          "historical_rank": 2,
+          "relevance": "thematically_related",
+          "rationale": "Определяет автономию воли, но не устанавливает условия допустимости внешнего принуждения."
+        },
+        {
+          "passage_id": "passage:mill:on-liberty:3:individuality:en",
+          "historical_rank": 3,
+          "relevance": "thematically_related",
+          "rationale": "Подчёркивает значимость развития индивидуальности, но не формулирует критерий допустимого принуждения."
+        }
+      ]
+    },
+    {
+      "case_id": "q4",
+      "judgments": [
+        {
+          "passage_id": "passage:mill:on-liberty:3:individuality:en",
+          "historical_rank": 1,
+          "relevance": "directly_relevant",
+          "rationale": "Прямо связывает индивидуальность с развитием и утверждает, что её культивирование производит развитых людей; подробный механизм не раскрыт."
+        },
+        {
+          "passage_id": "passage:mill:on-liberty:1:harm:en",
+          "historical_rank": 2,
+          "relevance": "thematically_related",
+          "rationale": "Устанавливает границы принуждения, но не объясняет вклад индивидуальности в развитие."
+        },
+        {
+          "passage_id": "passage:kant:groundwork:2:humanity:en",
+          "historical_rank": 3,
+          "relevance": "thematically_related",
+          "rationale": "Рассматривает отношение к человечеству как к цели, но не культивирование индивидуальности и его связь с развитием."
+        }
+      ]
+    },
+    {
+      "case_id": "q5",
+      "judgments": [
+        {
+          "passage_id": "passage:hegel:wl:being:de",
+          "historical_rank": 1,
+          "relevance": "directly_relevant",
+          "rationale": "Характеризует становление как нераздельность бытия и ничто и отличает её от абстрагирующегося от них единства."
+        },
+        {
+          "passage_id": "passage:cusanus:ddi:1.4:la",
+          "historical_rank": 2,
+          "relevance": "thematically_related",
+          "rationale": "Содержит мотив соотношения противоположностей — максимума и минимума, но не рассматривает становление, бытие и ничто."
+        },
+        {
+          "passage_id": "passage:cusanus:ddi:1.1:la",
+          "historical_rank": 3,
+          "relevance": "irrelevant",
+          "rationale": "Рассматривает сравнение, пропорцию и непостижимость бесконечного, а не отношение становления к бытию и ничто."
+        }
+      ]
+    },
+    {
+      "case_id": "q6",
+      "judgments": [
+        {
+          "passage_id": "passage:cusanus:ddi:1.1:la",
+          "historical_rank": 1,
+          "relevance": "directly_relevant",
+          "rationale": "Связывает исследование с пропорциональным сравнением и объясняет, что бесконечное ускользает от всякой пропорции."
+        },
+        {
+          "passage_id": "passage:cusanus:ddi:1.4:la",
+          "historical_rank": 2,
+          "relevance": "thematically_related",
+          "rationale": "Говорит о непостижимом понимании абсолютного максимума и совпадении максимума с минимумом, но не объясняет ограниченность сравнения и пропорции."
+        },
+        {
+          "passage_id": "passage:hegel:wl:being:de",
+          "historical_rank": 3,
+          "relevance": "irrelevant",
+          "rationale": "Рассматривает становление как нераздельность бытия и ничто, но не отношение бесконечного к сравнению и пропорции."
+        }
+      ]
+    },
+    {
+      "case_id": "paraphrase-p1",
+      "judgments": [
+        {
+          "passage_id": "passage:kant:groundwork:2:humanity:en",
+          "historical_rank": 1,
+          "relevance": "directly_relevant",
+          "rationale": "Формулирует требование относиться к человечеству как к цели, а не только как к средству; отвечает на вопрос «как следует поступать»."
+        },
+        {
+          "passage_id": "passage:mill:on-liberty:1:harm:en",
+          "historical_rank": 2,
+          "relevance": "thematically_related",
+          "rationale": "Ограничивает допустимое принуждение, но не формулирует принцип неинструментального отношения к человеку."
+        },
+        {
+          "passage_id": "passage:mill:on-liberty:3:individuality:en",
+          "historical_rank": 3,
+          "relevance": "thematically_related",
+          "rationale": "Рассматривает развитие индивидуальности, но не отвечает непосредственно на вопрос об обращении с другим человеком как с инструментом."
+        }
+      ]
+    },
+    {
+      "case_id": "paraphrase-p2",
+      "judgments": [
+        {
+          "passage_id": "passage:mill:on-liberty:1:harm:en",
+          "historical_rank": 1,
+          "relevance": "directly_relevant",
+          "rationale": "Формула об единственной допустимой цели — предотвращении вреда другим — отвечает на различение в пределах области применения цитаты."
+        },
+        {
+          "passage_id": "passage:mill:on-liberty:3:individuality:en",
+          "historical_rank": 2,
+          "relevance": "thematically_related",
+          "rationale": "Подчёркивает значимость развития индивидуальности, но не устанавливает достаточность собственного блага для оправдания принуждения."
+        },
+        {
+          "passage_id": "passage:kant:groundwork:2:humanity:en",
+          "historical_rank": 3,
+          "relevance": "thematically_related",
+          "rationale": "Рассматривает отношение к человеку как к цели, но не предложенную альтернативу оснований принуждения."
+        }
+      ]
+    },
+    {
+      "case_id": "paraphrase-p3",
+      "judgments": [
+        {
+          "passage_id": "passage:cusanus:ddi:1.4:la",
+          "historical_rank": 1,
+          "relevance": "directly_relevant",
+          "rationale": "Прямо утверждает совпадение минимума с абсолютным максимумом; искомое отношение сформулировано."
+        },
+        {
+          "passage_id": "passage:cusanus:ddi:1.1:la",
+          "historical_rank": 2,
+          "relevance": "thematically_related",
+          "rationale": "Рассматривает непостижимость бесконечного и ограничения пропорции, но не отношение максимума и минимума."
+        },
+        {
+          "passage_id": "passage:kant:groundwork:2:autonomy:en",
+          "historical_rank": 3,
+          "relevance": "irrelevant",
+          "rationale": "Определяет автономию воли и всеобщий закон; отношения абсолютного максимума и минимума во фрагменте нет."
+        }
+      ]
+    },
+    {
+      "case_id": "negative-n1",
+      "judgments": [
+        {
+          "passage_id": "passage:kant:groundwork:2:humanity:en",
+          "historical_rank": 1,
+          "relevance": "thematically_related",
+          "rationale": "Формулирует практический императив, но не вводит гипотетический императив и не проводит запрошенного различения."
+        },
+        {
+          "passage_id": "passage:kant:groundwork:2:autonomy:en",
+          "historical_rank": 2,
+          "relevance": "thematically_related",
+          "rationale": "Рассматривает автономию и всеобщий закон, но не сопоставляет два типа императивов."
+        },
+        {
+          "passage_id": "passage:mill:on-liberty:1:harm:en",
+          "historical_rank": 3,
+          "relevance": "irrelevant",
+          "rationale": "Устанавливает границу принуждения, а не различие типов императивов у Канта."
+        }
+      ]
+    },
+    {
+      "case_id": "negative-n2",
+      "judgments": [
+        {
+          "passage_id": "passage:kant:groundwork:2:humanity:en",
+          "historical_rank": 1,
+          "relevance": "thematically_related",
+          "rationale": "Неинструментальное отношение к человеку создаёт косвенную связь с проблемой господства, но текст не говорит о труде и формировании самосознания."
+        },
+        {
+          "passage_id": "passage:kant:groundwork:2:autonomy:en",
+          "historical_rank": 2,
+          "relevance": "thematically_related",
+          "rationale": "Самозаконодательство воли соседствует с проблематикой самостоятельности, но не раскрывает роль труда в запрошенном процессе."
+        },
+        {
+          "passage_id": "passage:hegel:wl:being:de",
+          "historical_rank": 3,
+          "relevance": "irrelevant",
+          "rationale": "Посвящён становлению, бытию и ничто; совпадение автора и диалектической проблематики не делает его ответом о труде и самосознании."
+        }
+      ]
+    },
+    {
+      "case_id": "negative-n3",
+      "judgments": [
+        {
+          "passage_id": "passage:cusanus:ddi:1.4:la",
+          "historical_rank": 1,
+          "relevance": "irrelevant",
+          "rationale": "Рассуждение об абсолютном максимуме и минимуме не содержит экспериментальных данных о квантовой запутанности."
+        },
+        {
+          "passage_id": "passage:cusanus:ddi:1.1:la",
+          "historical_rank": 2,
+          "relevance": "irrelevant",
+          "rationale": "Рассуждение о пределах пропорционального познания не описывает физические эксперименты и не является их свидетельством."
+        },
+        {
+          "passage_id": "passage:mill:on-liberty:1:harm:en",
+          "historical_rank": 3,
+          "relevance": "irrelevant",
+          "rationale": "Фрагмент о допустимости принуждения не связан с экспериментальным подтверждением квантовой запутанности."
+        }
+      ]
+    }
+  ]
+}
