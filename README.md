@@ -177,6 +177,21 @@ uv run ruff check .
 uv run pytest
 ```
 
+## Continuous integration
+
+The GitHub Actions workflow `.github/workflows/tests.yml` runs on pushes to `main`, pull requests, and manual dispatch.
+
+It contains two independent jobs:
+
+- `Unit and API tests`: installs Python 3.12 and locked dependencies, then runs `tests/`.
+- `Chromium UI tests`: checks lint and formatting in `browser_tests/`, installs Chromium and its system dependencies, then runs the browser tests.
+
+Both jobs install dependencies with `uv sync --locked --all-groups --python 3.12`.
+
+The workflow sets `NEO4J_ENABLED=false` so application imports do not require local Neo4j credentials. This workflow does not provision a live Neo4j server and does not establish live-database integration coverage.
+
+The first successful run of both jobs was confirmed on commit `3767446`.
+
 ## API examples
 
 ### Application health
@@ -302,7 +317,8 @@ Generated responses must cite corpus passages. If available evidence is insuffic
 - [ ] Source-grounded RAG responses.
 - [ ] LangGraph evidence-grade and query-rewrite workflow.
 - [ ] RU/EN/DE Next.js interface with graph visualization.
-- [ ] Evaluation data set, quality metrics, tracing, CI/CD, and deployed demo.
+- [x] GitHub Actions CI for unit/API tests and Chromium browser tests.
+- [ ] Evaluation data set, quality metrics, tracing, deployment automation, and deployed demo.
 
 ## License
 
