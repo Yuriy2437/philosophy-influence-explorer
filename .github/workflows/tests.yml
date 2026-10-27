@@ -9,6 +9,9 @@ on:
 permissions:
   contents: read
 
+env:
+  NEO4J_ENABLED: 'false'
+
 jobs:
   unit-api:
     name: Unit and API tests
