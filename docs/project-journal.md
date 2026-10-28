@@ -635,3 +635,61 @@
   генерацию, научную достоверность или полноту корпуса.
 - Для N1–N3 возвращение прежних passages
   не означает наличия прямого ответа.
+
+## 2026-10-28 — Первый retrieval-workflow LangGraph
+
+### Реализация
+
+- Добавлена зависимость langgraph;
+  установленная версия — 1.2.18, обновлён uv.lock.
+- Создан workflow:
+  validate_request -> retrieve_context -> prepare_evidence.
+- Используется существующий SemanticGraphRetriever.
+- Исходная семантическая выдача и графовые пути
+  сохраняются отдельно от уникального evidence.
+- Дополнительным passages не назначается Similarity.
+- Конфликт текста или provenance одного passage ID
+  приводит к ошибке.
+- Ошибки не преобразуются в успешную пустую выдачу.
+- API и retrieval-сервисы не менялись.
+
+### Автономные проверки
+
+- Workflow-проверки: 21 passed.
+- Полный набор tests: 144 passed, 1 предупреждение зависимости.
+- Ruff для новых workflow-файлов и тестов прошёл.
+- git diff --check прошёл.
+- Docker и Ollama для этих проверок не использовались.
+
+### Реальная проверка
+
+- Запуск выполнен через скомпилированный граф
+  с Aura и Gemini gemini-embedding-001, 768 измерений.
+- Вопрос: How is becoming related to being and nothing?
+- limit=1, graph_limit=20, без дополнительных фильтров.
+- Семантический результат:
+  passage:hegel:wl:being:en,
+  editorial_summary, curated, Similarity 0.886.
+- Через concept:becoming получены 2 пути:
+  к passage:hegel:wl:being:de
+  и passage:hegel:wl:being:ru.
+- Немецкий passage — primary_quote, reviewed.
+- Русский passage — editorial_summary, curated.
+- Evidence содержит 3 уникальных passage,
+  из них 2 дополнительных графовых.
+- Проверки состава и порядка evidence,
+  направлений, ID и разрешённых статусов рёбер прошли.
+- Итог: PASS.
+- Seed, переиндексация и запись в граф не выполнялись.
+- Постоянные настройки окружения не менялись.
+- Временный проверочный скрипт удалён.
+- Подробности: docs/langgraph-retrieval-workflow.md.
+
+### Границы
+
+- Проверен один реальный вопрос без фильтров.
+- Число passages не означает число независимых свидетельств.
+- Генерация, оценка достаточности, query rewrite,
+  память диалога и checkpointing не добавлялись.
+- API и опубликованный deployment к workflow не подключались.
+- Результат CI для будущего коммита пока не подтверждён.

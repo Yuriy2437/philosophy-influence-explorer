@@ -193,6 +193,7 @@ The workflow sets `NEO4J_ENABLED=false` so application imports do not require lo
 The first successful run of both jobs was confirmed on commit `3767446`.
 
 Semantic-search regression evaluation is documented in [Semantic search evaluation](docs/semantic-search-evaluation.md). Its autonomous tests run in CI; live retrieval evaluation is run separately with configured Neo4j and embedding services.
+The initial LangGraph retrieval workflow and its verification are documented in [LangGraph retrieval workflow](docs/langgraph-retrieval-workflow.md). It orchestrates existing retrieval and prepares evidence; answer generation is not yet implemented.
 
 ## API examples
 
