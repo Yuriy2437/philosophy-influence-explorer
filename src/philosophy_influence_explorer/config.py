@@ -40,6 +40,17 @@ class Settings(BaseSettings):
     anthropic_api_key: SecretStr | None = None
     google_api_key: SecretStr | None = None
     ollama_base_url: str = "http://localhost:11434"
+    generation_enabled: bool = False
+    generation_access_token: SecretStr | None = None
+    generation_model: str = Field(
+        default="gemini-3.5-flash-lite",
+        pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]*$",
+    )
+    generation_timeout_seconds: float = Field(
+        default=60.0,
+        gt=0,
+        allow_inf_nan=False,
+    )
 
     embedding_provider: str = "ollama"
     embedding_model: str = "bge-m3:567m"

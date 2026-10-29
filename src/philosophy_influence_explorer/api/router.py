@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter
 
+from philosophy_influence_explorer.api.routes.answers import router as answers_router
 from philosophy_influence_explorer.api.routes.concepts import router as concepts_router
 from philosophy_influence_explorer.api.routes.database import router as database_router
 from philosophy_influence_explorer.api.routes.health import router as health_router
@@ -14,3 +15,4 @@ api_router.include_router(database_router)
 api_router.include_router(passages_router)
 api_router.include_router(concepts_router)
 api_router.include_router(query_router)
+api_router.include_router(answers_router)
