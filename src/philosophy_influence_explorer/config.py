@@ -43,6 +43,11 @@ class Settings(BaseSettings):
         gt=0,
         allow_inf_nan=False,
     )
+    neo4j_retrieval_transaction_timeout_seconds: float = Field(
+        default=10.0,
+        gt=0,
+        allow_inf_nan=False,
+    )
 
     llm_provider: str = "ollama"
     llm_model: str = ""

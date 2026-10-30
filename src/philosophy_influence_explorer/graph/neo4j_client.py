@@ -3,7 +3,7 @@
 from collections.abc import Iterator
 from contextlib import contextmanager
 
-from neo4j import Driver, GraphDatabase
+from neo4j import Driver, GraphDatabase, Query
 from neo4j.exceptions import Neo4jError
 
 from philosophy_influence_explorer.config import Settings
@@ -19,6 +19,9 @@ class Neo4jClient:
         if settings.neo4j_password is None:
             raise ValueError("Neo4j password is not configured.")
         self._database = settings.neo4j_database
+        self._retrieval_transaction_timeout_seconds = (
+            settings.neo4j_retrieval_transaction_timeout_seconds
+        )
         self._driver: Driver = GraphDatabase.driver(
             settings.neo4j_uri,
             auth=(
@@ -29,6 +32,13 @@ class Neo4jClient:
             connection_acquisition_timeout=(
                 settings.neo4j_connection_acquisition_timeout_seconds
             ),
+        )
+
+    def retrieval_query(self, text: str) -> Query:
+        """Build a query with the configured retrieval transaction timeout."""
+        return Query(
+            text,
+            timeout=self._retrieval_transaction_timeout_seconds,
         )
 
     def verify_connectivity(self) -> None:

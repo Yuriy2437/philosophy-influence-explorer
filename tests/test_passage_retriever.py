@@ -6,6 +6,7 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 
 import pytest
+from neo4j import Query
 
 from philosophy_influence_explorer.embeddings.base import (
     EmbeddingModelInfo,
@@ -59,19 +60,25 @@ class FakeSession:
 
     def run(
         self,
-        query: str,
+        query: Query,
         **parameters: object,
     ) -> FakeResult:
         """Capture the retrieval query and its bound parameters."""
-        self.calls.append((query, parameters))
+        assert isinstance(query, Query)
+        assert query.timeout == 7.0
+        self.calls.append((query.text, parameters))
         return FakeResult(self._records)
 
 
 class FakeClient:
-    """Expose the context-managed session surface used by PassageRetriever."""
+    """Expose the client surface used by PassageRetriever."""
 
     def __init__(self, records: list[dict[str, object]]) -> None:
         self.fake_session = FakeSession(records)
+
+    def retrieval_query(self, text: str) -> Query:
+        """Build a timed query for the fake session."""
+        return Query(text, timeout=7.0)
 
     @contextmanager
     def session(self) -> Iterator[FakeSession]:

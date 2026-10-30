@@ -16,6 +16,7 @@ def isolate_connection_settings(monkeypatch):
     for name in (
         "NEO4J_CONNECTION_TIMEOUT_SECONDS",
         "NEO4J_CONNECTION_ACQUISITION_TIMEOUT_SECONDS",
+        "NEO4J_RETRIEVAL_TRANSACTION_TIMEOUT_SECONDS",
     ):
         monkeypatch.delenv(name, raising=False)
 
@@ -127,3 +128,72 @@ def test_installed_driver_accepts_connection_configuration_without_network(
 
     client = client_module.Neo4jClient(settings)
     client.close()
+
+
+def test_retrieval_transaction_timeout_default() -> None:
+    settings = Settings(_env_file=None, neo4j_enabled=False)
+
+    assert settings.neo4j_retrieval_transaction_timeout_seconds == 10.0
+
+
+@pytest.mark.parametrize(
+    "value",
+    [0, -1, float("inf"), float("-inf"), float("nan")],
+)
+def test_invalid_retrieval_transaction_timeout_is_rejected(
+    value: float,
+) -> None:
+    with pytest.raises(ValidationError):
+        Settings(
+            _env_file=None,
+            neo4j_enabled=False,
+            neo4j_retrieval_transaction_timeout_seconds=value,
+        )
+
+
+def test_retrieval_transaction_timeout_loads_from_environment(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv(
+        "NEO4J_RETRIEVAL_TRANSACTION_TIMEOUT_SECONDS",
+        "8.5",
+    )
+
+    settings = Settings(_env_file=None, neo4j_enabled=False)
+
+    assert settings.neo4j_retrieval_transaction_timeout_seconds == 8.5
+
+
+def test_client_builds_retrieval_query_with_configured_timeout(
+    monkeypatch,
+) -> None:
+    from neo4j import Query
+
+    settings = Settings(
+        _env_file=None,
+        neo4j_enabled=True,
+        neo4j_uri="bolt://127.0.0.1:7687",
+        neo4j_username="test-user",
+        neo4j_password="test-password",
+        neo4j_retrieval_transaction_timeout_seconds=3.5,
+    )
+    driver = Mock()
+    monkeypatch.setattr(
+        client_module.GraphDatabase,
+        "driver",
+        Mock(return_value=driver),
+    )
+
+    client = client_module.Neo4jClient(settings)
+    try:
+        query = client.retrieval_query("RETURN $value AS value")
+
+        assert isinstance(query, Query)
+        assert query.text == "RETURN $value AS value"
+        assert query.timeout == 3.5
+        driver.session.assert_not_called()
+        driver.verify_connectivity.assert_not_called()
+    finally:
+        client.close()
+
+    driver.close.assert_called_once_with()

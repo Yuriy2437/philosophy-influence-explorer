@@ -178,7 +178,7 @@ class GraphContextRetriever:
             with self._client.session() as session:
                 records = list(
                     session.run(
-                        query,
+                        self._client.retrieval_query(query),
                         seed_ids=normalized_seed_ids,
                         dataset_id=DATASET_ID,
                         allowed_edge_statuses=list(_ALLOWED_EDGE_STATUSES),

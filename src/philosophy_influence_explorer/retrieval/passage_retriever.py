@@ -173,7 +173,7 @@ class PassageRetriever:
         try:
             with self._client.session() as session:
                 result = session.run(
-                    cypher,
+                    self._client.retrieval_query(cypher),
                     query_embedding=query_embedding,
                     dataset_id=DATASET_ID,
                     provider=self._provider.model_info.provider,

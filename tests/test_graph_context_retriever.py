@@ -6,6 +6,7 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 
 import pytest
+from neo4j import Query
 from neo4j.exceptions import Neo4jError
 
 from philosophy_influence_explorer.retrieval.graph_context_retriever import (
@@ -33,17 +34,19 @@ class FakeSession:
 
     def run(
         self,
-        query: str,
+        query: Query,
         **parameters: object,
     ) -> list[dict[str, object]]:
-        self.calls.append((query, parameters))
+        assert isinstance(query, Query)
+        assert query.timeout == 7.0
+        self.calls.append((query.text, parameters))
         if self.error is not None:
             raise self.error
         return self.records
 
 
 class FakeClient:
-    """Expose the session interface used by the retriever."""
+    """Expose the client interface used by the retriever."""
 
     def __init__(
         self,
@@ -54,6 +57,10 @@ class FakeClient:
             records if records is not None else [],
             error,
         )
+
+    def retrieval_query(self, text: str) -> Query:
+        """Build a timed query for the fake session."""
+        return Query(text, timeout=7.0)
 
     @contextmanager
     def session(self) -> Iterator[FakeSession]:
