@@ -377,3 +377,119 @@ def test_failed_generation_makes_exactly_one_http_request(
         )
 
     assert call_count == 1
+
+
+@pytest.mark.parametrize("budget_delta", [0, 1, -1])
+def test_generation_input_byte_budget_boundary(
+    monkeypatch,
+    budget_delta: int,
+) -> None:
+    query = "Почему? Warum? 哲学"
+    request_data = {
+        "question": query,
+        "passages": [],
+        "semantic_passage_ids": [],
+        "additional_graph_passage_ids": [],
+    }
+    serialized = json.dumps(request_data, ensure_ascii=False)
+    exact_size = len(serialized.encode("utf-8"))
+    calls = []
+
+    def fake_post(*args, **kwargs):
+        calls.append(kwargs)
+        return response(envelope(insufficient_answer()))
+
+    monkeypatch.setattr(httpx, "post", fake_post)
+
+    instance = GeminiAnswerGenerator(
+        api_key="test-key",
+        model="test-model",
+        timeout_seconds=5.0,
+        max_input_bytes=exact_size + budget_delta,
+    )
+
+    if budget_delta < 0:
+        with pytest.raises(
+            GeminiAnswerGeneratorError,
+            match="byte budget",
+        ):
+            instance.generate(
+                query_text=query,
+                evidence=EvidencePacket((), (), ()),
+            )
+        assert calls == []
+    else:
+        answer = instance.generate(
+            query_text=query,
+            evidence=EvidencePacket((), (), ()),
+        )
+        assert answer.status == "insufficient_evidence"
+        assert len(calls) == 1
+        sent = calls[0]["json"]["contents"][0]["parts"][0]["text"]
+        assert sent == serialized
+
+
+@pytest.mark.parametrize("budget", [0, -1, True, 1.5, "64000"])
+def test_invalid_generation_input_budget_is_rejected(budget) -> None:
+    with pytest.raises(ValueError, match="positive integer"):
+        GeminiAnswerGenerator(
+            api_key="test-key",
+            model="test-model",
+            max_input_bytes=budget,
+        )
+
+
+@pytest.mark.parametrize("oversized_field", ["text", "citation_label"])
+def test_default_input_budget_rejects_oversized_evidence_before_http(
+    monkeypatch,
+    oversized_field: str,
+) -> None:
+    from dataclasses import replace
+    from unittest.mock import Mock
+
+    record = GraphContextPassage(
+        id="passage:budget-test",
+        text="Synthetic evidence.",
+        source_id="source:budget-test",
+        work_id="work:budget-test",
+        citation_label="Synthetic fixture",
+        language="ru",
+        text_kind="editorial_summary",
+        review_status="candidate",
+        is_verbatim=False,
+        is_editorial=True,
+        is_machine_generated=False,
+    )
+
+    oversized_value = "private-evidence-marker:" + ("Ж" * 32_001)
+    record = replace(record, **{oversized_field: oversized_value})
+
+    evidence = EvidencePacket(
+        passages=(record,),
+        semantic_passage_ids=(record.id,),
+        additional_graph_passage_ids=(),
+    )
+
+    post = Mock(side_effect=AssertionError("Unexpected HTTP request."))
+    monkeypatch.setattr(httpx, "post", post)
+
+    instance = GeminiAnswerGenerator(
+        api_key="test-key",
+        model="test-model",
+        timeout_seconds=5.0,
+    )
+
+    with pytest.raises(
+        GeminiAnswerGeneratorError,
+        match="byte budget",
+    ) as caught:
+        instance.generate(
+            query_text="Question",
+            evidence=evidence,
+        )
+
+    post.assert_not_called()
+    assert "private-evidence-marker" not in str(caught.value)
+    assert "test-key" not in str(caught.value)
+    assert record.review_status == "candidate"
+    assert getattr(record, oversized_field) == oversized_value

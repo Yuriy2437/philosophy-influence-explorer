@@ -55,17 +55,24 @@ class GeminiAnswerGenerator:
         api_key: str,
         model: str,
         timeout_seconds: float = 60.0,
+        max_input_bytes: int = 64_000,
     ) -> None:
         if not api_key.strip():
             raise ValueError("GOOGLE_API_KEY is required for generation.")
+
         if re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", model) is None:
             raise ValueError("model must be a bare model ID.")
+
         if not math.isfinite(timeout_seconds) or timeout_seconds <= 0:
             raise ValueError("timeout_seconds must be positive and finite.")
+
+        if type(max_input_bytes) is not int or max_input_bytes < 1:
+            raise ValueError("max_input_bytes must be a positive integer.")
 
         self._api_key = api_key.strip()
         self._model = model
         self._timeout_seconds = timeout_seconds
+        self._max_input_bytes = max_input_bytes
 
     def generate(
         self,
@@ -83,6 +90,16 @@ class GeminiAnswerGenerator:
             "semantic_passage_ids": list(evidence.semantic_passage_ids),
             "additional_graph_passage_ids": list(evidence.additional_graph_passage_ids),
         }
+        serialized_input = json.dumps(
+            request_data,
+            ensure_ascii=False,
+        )
+        input_size_bytes = len(serialized_input.encode("utf-8"))
+
+        if input_size_bytes > self._max_input_bytes:
+            raise GeminiAnswerGeneratorError(
+                "Generation input exceeds the configured byte budget."
+            )
         url = (
             f"https://generativelanguage.googleapis.com/v1beta/models/{self._model}:generateContent"
         )
@@ -98,10 +115,7 @@ class GeminiAnswerGenerator:
                             "role": "user",
                             "parts": [
                                 {
-                                    "text": json.dumps(
-                                        request_data,
-                                        ensure_ascii=False,
-                                    )
+                                    "text": serialized_input
                                 }
                             ],
                         }
@@ -121,28 +135,34 @@ class GeminiAnswerGenerator:
                 f"Gemini generation request failed (HTTP {error.response.status_code})."
             ) from None
         except httpx.HTTPError:
-            raise GeminiAnswerGeneratorError("Could not reach the Gemini generation API.") from None
+            raise GeminiAnswerGeneratorError(
+                "Could not reach the Gemini generation API.") from None
 
         try:
             payload = response.json()
         except ValueError:
-            raise GeminiAnswerGeneratorError("Gemini returned invalid response JSON.") from None
+            raise GeminiAnswerGeneratorError(
+                "Gemini returned invalid response JSON.") from None
 
         if not isinstance(payload, dict):
-            raise GeminiAnswerGeneratorError("Invalid Gemini response envelope.")
+            raise GeminiAnswerGeneratorError(
+                "Invalid Gemini response envelope.")
 
         candidates = payload.get("candidates")
         if not isinstance(candidates, list) or len(candidates) != 1:
-            raise GeminiAnswerGeneratorError("Gemini did not return exactly one candidate.")
+            raise GeminiAnswerGeneratorError(
+                "Gemini did not return exactly one candidate.")
 
         candidate = candidates[0]
         if not isinstance(candidate, dict) or candidate.get("finishReason") != "STOP":
-            raise GeminiAnswerGeneratorError("Gemini did not complete the answer normally.")
+            raise GeminiAnswerGeneratorError(
+                "Gemini did not complete the answer normally.")
 
         content = candidate.get("content")
         parts = content.get("parts") if isinstance(content, dict) else None
         if not isinstance(parts, list):
-            raise GeminiAnswerGeneratorError("Gemini returned no answer parts.")
+            raise GeminiAnswerGeneratorError(
+                "Gemini returned no answer parts.")
 
         text_parts = [
             part["text"]
