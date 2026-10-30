@@ -33,6 +33,16 @@ class Settings(BaseSettings):
     neo4j_username: str = "neo4j"
     neo4j_password: SecretStr | None = None
     neo4j_database: str = "neo4j"
+    neo4j_connection_timeout_seconds: float = Field(
+        default=10.0,
+        gt=0,
+        allow_inf_nan=False,
+    )
+    neo4j_connection_acquisition_timeout_seconds: float = Field(
+        default=20.0,
+        gt=0,
+        allow_inf_nan=False,
+    )
 
     llm_provider: str = "ollama"
     llm_model: str = ""

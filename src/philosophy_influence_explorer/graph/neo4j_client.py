@@ -25,6 +25,10 @@ class Neo4jClient:
                 settings.neo4j_username,
                 settings.neo4j_password.get_secret_value(),
             ),
+            connection_timeout=settings.neo4j_connection_timeout_seconds,
+            connection_acquisition_timeout=(
+                settings.neo4j_connection_acquisition_timeout_seconds
+            ),
         )
 
     def verify_connectivity(self) -> None:
