@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from typing import Any
 
 import httpx
@@ -27,6 +28,9 @@ class OllamaEmbeddingProvider(EmbeddingProvider):
         dimensions: int,
         timeout_seconds: float,
     ) -> None:
+        if not math.isfinite(timeout_seconds) or timeout_seconds <= 0:
+            raise ValueError("timeout_seconds must be positive and finite.")
+
         self._base_url = base_url.rstrip("/")
         self._model = model
         self._dimensions = dimensions

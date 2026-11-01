@@ -28,7 +28,8 @@ class GeminiEmbeddingProvider(EmbeddingProvider):
         timeout_seconds: float,
     ) -> None:
         if not api_key.strip():
-            raise ValueError("GOOGLE_API_KEY is required for Gemini embeddings.")
+            raise ValueError(
+                "GOOGLE_API_KEY is required for Gemini embeddings.")
 
         if model != "gemini-embedding-001":
             raise ValueError(
@@ -37,6 +38,9 @@ class GeminiEmbeddingProvider(EmbeddingProvider):
 
         if not 128 <= dimensions <= 3072:
             raise ValueError("Gemini embedding dimensions must be 128..3072.")
+
+        if not math.isfinite(timeout_seconds) or timeout_seconds <= 0:
+            raise ValueError("timeout_seconds must be positive and finite.")
 
         self._api_key = api_key.strip()
         self._model = model
