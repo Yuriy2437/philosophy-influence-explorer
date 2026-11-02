@@ -35,19 +35,37 @@ def build_answer_workflow(
     retrieval_graph = build_retrieval_workflow(retriever)
 
     def generate_answer(state: AnswerState) -> dict:
+        budget = state.get("execution_budget")
+
+        if budget is not None:
+            budget.check()
+
         draft = generator.generate(
             query_text=state["query_text"],
             evidence=state["evidence"],
         )
+
+        if budget is not None:
+            budget.check()
+
         return {"draft_answer": draft}
 
     def validate_answer_structure(state: AnswerState) -> dict:
+        budget = state.get("execution_budget")
+
+        if budget is not None:
+            budget.check()
+
         draft = state["draft_answer"]
         if not isinstance(draft, GroundedAnswer):
             raise ValueError("Generator must return GroundedAnswer.")
 
         answer = GroundedAnswer.model_validate(draft.model_dump())
         validate_answer_references(answer, state["evidence"])
+
+        if budget is not None:
+            budget.check()
+
         return {"answer": answer}
 
     builder = StateGraph(AnswerState)

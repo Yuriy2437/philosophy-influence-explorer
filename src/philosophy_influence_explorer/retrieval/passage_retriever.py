@@ -9,6 +9,7 @@ from neo4j.exceptions import Neo4jError
 from philosophy_influence_explorer.embeddings.base import EmbeddingProvider
 from philosophy_influence_explorer.graph.neo4j_client import Neo4jClient
 from philosophy_influence_explorer.retrieval.passage_indexer import DATASET_ID
+from philosophy_influence_explorer.time_budget import ExecutionBudget
 
 
 @dataclass(frozen=True)
@@ -79,6 +80,7 @@ class PassageRetriever:
         *,
         limit: int = 5,
         filters: PassageSearchFilters | None = None,
+        budget: ExecutionBudget | None = None,
     ) -> list[RetrievedPassage]:
         """Embed a query and rank all eligible passages by cosine similarity."""
         normalized_query = query_text.strip()
@@ -95,7 +97,13 @@ class PassageRetriever:
             else PassageSearchFilters()
         )
 
+        if budget is not None:
+            budget.check()
+
         query_embedding = self._provider.embed_query(normalized_query)
+
+        if budget is not None:
+            budget.check()
 
         expected_dimensions = self._provider.model_info.dimensions
         if len(query_embedding) != expected_dimensions:
@@ -170,6 +178,9 @@ class PassageRetriever:
         LIMIT $limit
         """
 
+        if budget is not None:
+            budget.check()
+
         try:
             with self._client.session() as session:
                 result = session.run(
@@ -191,7 +202,10 @@ class PassageRetriever:
                 "Unable to search curated Passage embeddings in Neo4j."
             ) from error
 
-        return [
+        if budget is not None:
+            budget.check()
+
+        passages = [
             RetrievedPassage(
                 id=record["id"],
                 text=record["text"],
@@ -219,6 +233,11 @@ class PassageRetriever:
             )
             for record in records
         ]
+
+        if budget is not None:
+            budget.check()
+
+        return passages
 
 
 def _normalize_optional_text(value: str | None) -> str | None:

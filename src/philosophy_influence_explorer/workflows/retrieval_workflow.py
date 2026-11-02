@@ -13,6 +13,7 @@ from philosophy_influence_explorer.retrieval.semantic_graph_retriever import (
     SemanticGraphResult,
     SemanticGraphRetriever,
 )
+from philosophy_influence_explorer.time_budget import ExecutionBudget
 from philosophy_influence_explorer.workflows.evidence import (
     EvidencePacket,
     prepare_evidence,
@@ -26,6 +27,7 @@ class RetrievalState(TypedDict):
     limit: NotRequired[int]
     graph_limit: NotRequired[int]
     filters: NotRequired[PassageSearchFilters]
+    execution_budget: NotRequired[ExecutionBudget]
     retrieval_result: NotRequired[SemanticGraphResult]
     evidence: NotRequired[EvidencePacket]
 
@@ -52,6 +54,12 @@ def validate_request(state: RetrievalState) -> dict:
     if not isinstance(filters, PassageSearchFilters):
         raise ValueError("filters must be PassageSearchFilters.")
 
+    budget = state.get("execution_budget")
+    if budget is not None:
+        if not isinstance(budget, ExecutionBudget):
+            raise ValueError("execution_budget must be ExecutionBudget.")
+        budget.check()
+
     return {
         "query_text": normalized_query,
         "limit": limit,
@@ -64,18 +72,40 @@ def build_retrieval_workflow(retriever: SemanticGraphRetriever):
     """Compile a fresh graph without configuring external services."""
 
     def retrieve_context(state: RetrievalState) -> dict:
-        result = retriever.retrieve(
-            state["query_text"],
-            limit=state["limit"],
-            graph_limit=state["graph_limit"],
-            filters=state["filters"],
-        )
+        budget = state.get("execution_budget")
+
+        if budget is not None:
+            budget.check()
+            result = retriever.retrieve(
+                state["query_text"],
+                limit=state["limit"],
+                graph_limit=state["graph_limit"],
+                filters=state["filters"],
+                budget=budget,
+            )
+            budget.check()
+        else:
+            result = retriever.retrieve(
+                state["query_text"],
+                limit=state["limit"],
+                graph_limit=state["graph_limit"],
+                filters=state["filters"],
+            )
+
         return {"retrieval_result": result}
 
     def prepare_evidence_node(state: RetrievalState) -> dict:
-        return {
-            "evidence": prepare_evidence(state["retrieval_result"]),
-        }
+        budget = state.get("execution_budget")
+
+        if budget is not None:
+            budget.check()
+
+        evidence = prepare_evidence(state["retrieval_result"])
+
+        if budget is not None:
+            budget.check()
+
+        return {"evidence": evidence}
 
     builder = StateGraph(RetrievalState)
     builder.add_node("validate_request", validate_request)

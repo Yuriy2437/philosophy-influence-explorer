@@ -13,6 +13,7 @@ from philosophy_influence_explorer.retrieval.passage_retriever import (
     PassageSearchFilters,
     RetrievedPassage,
 )
+from philosophy_influence_explorer.time_budget import ExecutionBudget
 
 
 @dataclass(frozen=True)
@@ -42,12 +43,14 @@ class SemanticGraphRetriever:
         limit: int = 5,
         graph_limit: int = 20,
         filters: PassageSearchFilters | None = None,
+        budget: ExecutionBudget | None = None,
     ) -> SemanticGraphResult:
         """Run semantic retrieval once, then return bounded graph paths.
 
         The graph limit is global across all semantic seeds.
         Graph paths are not reranked or merged into semantic matches.
         Dependency failures propagate instead of becoming empty results.
+        An optional budget is checked between execution stages.
         """
         normalized_query = query_text.strip()
 
@@ -66,11 +69,21 @@ class SemanticGraphRetriever:
             else PassageSearchFilters()
         )
 
-        passages = self._passage_retriever.search(
-            normalized_query,
-            limit=limit,
-            filters=normalized_filters,
-        )
+        if budget is not None:
+            budget.check()
+            passages = self._passage_retriever.search(
+                normalized_query,
+                limit=limit,
+                filters=normalized_filters,
+                budget=budget,
+            )
+            budget.check()
+        else:
+            passages = self._passage_retriever.search(
+                normalized_query,
+                limit=limit,
+                filters=normalized_filters,
+            )
 
         if not passages:
             return SemanticGraphResult(
@@ -80,13 +93,21 @@ class SemanticGraphRetriever:
 
         seed_ids = list(dict.fromkeys(passage.id for passage in passages))
 
+        if budget is not None:
+            budget.check()
+
         paths = self._graph_context_retriever.expand(
             seed_ids,
             limit=graph_limit,
             filters=normalized_filters,
         )
 
-        return SemanticGraphResult(
+        result = SemanticGraphResult(
             semantic_passages=tuple(passages),
             graph_context=tuple(paths),
         )
+
+        if budget is not None:
+            budget.check()
+
+        return result

@@ -17,6 +17,10 @@ from philosophy_influence_explorer.retrieval.passage_retriever import (
     PassageRetriever,
     PassageSearchFilters,
 )
+from philosophy_influence_explorer.time_budget import (
+    ExecutionBudget,
+    ExecutionBudgetExceededError,
+)
 
 
 class FakeProvider(EmbeddingProvider):
@@ -239,3 +243,74 @@ def test_search_rejects_query_vector_with_wrong_dimension() -> None:
         retriever.search("freedom and morality")
 
     assert client.fake_session.calls == []
+
+
+def test_expired_budget_prevents_embedding_and_database_calls(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    now = [100.0]
+    budget = ExecutionBudget(5.0, clock=lambda: now[0])
+    provider = FakeProvider()
+    client = FakeClient([])
+
+    def deny_embedding(text: str) -> list[float]:
+        raise AssertionError("Embedding must not start after budget expiry.")
+
+    monkeypatch.setattr(provider, "embed_query", deny_embedding)
+    now[0] = 105.0
+
+    retriever = PassageRetriever(client=client, provider=provider)
+
+    with pytest.raises(ExecutionBudgetExceededError):
+        retriever.search("freedom and morality", budget=budget)
+
+    assert client.fake_session.calls == []
+
+
+def test_budget_expiry_after_embedding_prevents_database_query() -> None:
+    now = [100.0]
+    budget = ExecutionBudget(5.0, clock=lambda: now[0])
+
+    class SlowProvider(FakeProvider):
+        def embed_query(self, text: str) -> list[float]:
+            vector = super().embed_query(text)
+            now[0] = 105.0
+            return vector
+
+    client = FakeClient([])
+    retriever = PassageRetriever(client=client, provider=SlowProvider())
+
+    with pytest.raises(ExecutionBudgetExceededError):
+        retriever.search("freedom and morality", budget=budget)
+
+    assert client.fake_session.calls == []
+
+
+def test_budget_expiry_during_result_consumption_rejects_result(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    now = [100.0]
+    budget = ExecutionBudget(5.0, clock=lambda: now[0])
+    client = FakeClient([_record()])
+    original_run = client.fake_session.run
+
+    def slow_run(query, **parameters):
+        result = original_run(query, **parameters)
+
+        def records():
+            yield from result
+            now[0] = 105.0
+
+        return records()
+
+    monkeypatch.setattr(client.fake_session, "run", slow_run)
+
+    retriever = PassageRetriever(
+        client=client,
+        provider=FakeProvider(),
+    )
+
+    with pytest.raises(ExecutionBudgetExceededError):
+        retriever.search("freedom and morality", budget=budget)
+
+    assert len(client.fake_session.calls) == 1

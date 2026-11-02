@@ -21,6 +21,10 @@ from philosophy_influence_explorer.retrieval.semantic_graph_retriever import (
 from philosophy_influence_explorer.workflows.answer_workflow import (
     build_answer_workflow,
 )
+from philosophy_influence_explorer.time_budget import (
+    ExecutionBudget,
+    ExecutionBudgetExceededError,
+)
 
 
 def synthetic_passage() -> RetrievedPassage:
@@ -352,3 +356,119 @@ def test_additional_graph_passage_can_support_answer() -> None:
     )
     assert state["answer"] == expected
     assert state["answer"].claims[0].passage_ids == [related.id]
+
+
+def test_answer_graph_preserves_budget_through_nested_retrieval() -> None:
+    now = [100.0]
+    budget = ExecutionBudget(5.0, clock=lambda: now[0])
+    retriever, generator = dependencies()
+    expected = supported_answer()
+    generator.generate.return_value = expected
+
+    state = build_answer_workflow(retriever, generator).invoke(
+        {
+            "query_text": "question",
+            "execution_budget": budget,
+        }
+    )
+
+    assert state["execution_budget"] is budget
+    assert state["answer"] == expected
+    assert retriever.retrieve.call_args.kwargs["budget"] is budget
+    retriever.retrieve.assert_called_once()
+    generator.generate.assert_called_once_with(
+        query_text="question",
+        evidence=state["evidence"],
+    )
+
+
+def test_answer_graph_expiry_during_retrieval_prevents_generation() -> None:
+    now = [100.0]
+    budget = ExecutionBudget(5.0, clock=lambda: now[0])
+    retriever, generator = dependencies()
+    retrieval_result = retriever.retrieve.return_value
+
+    def slow_retrieve(*args, **kwargs):
+        assert kwargs["budget"] is budget
+        now[0] = 105.0
+        return retrieval_result
+
+    retriever.retrieve.side_effect = slow_retrieve
+
+    with pytest.raises(ExecutionBudgetExceededError):
+        build_answer_workflow(retriever, generator).invoke(
+            {
+                "query_text": "question",
+                "execution_budget": budget,
+            }
+        )
+
+    retriever.retrieve.assert_called_once()
+    generator.generate.assert_not_called()
+
+
+def test_answer_graph_expiry_during_generation_rejects_draft(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    now = [100.0]
+    budget = ExecutionBudget(5.0, clock=lambda: now[0])
+    retriever, generator = dependencies()
+
+    def slow_generate(*, query_text, evidence):
+        now[0] = 105.0
+        return supported_answer()
+
+    def deny_validation(*args, **kwargs):
+        raise AssertionError("Answer validation must not start.")
+
+    generator.generate.side_effect = slow_generate
+    monkeypatch.setattr(
+        "philosophy_influence_explorer.workflows."
+        "answer_workflow.validate_answer_references",
+        deny_validation,
+    )
+
+    with pytest.raises(ExecutionBudgetExceededError):
+        build_answer_workflow(retriever, generator).invoke(
+            {
+                "query_text": "question",
+                "execution_budget": budget,
+            }
+        )
+
+    retriever.retrieve.assert_called_once()
+    generator.generate.assert_called_once()
+
+
+def test_answer_graph_expiry_during_validation_rejects_answer(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from philosophy_influence_explorer.generation.contracts import (
+        validate_answer_references,
+    )
+
+    now = [100.0]
+    budget = ExecutionBudget(5.0, clock=lambda: now[0])
+    retriever, generator = dependencies()
+    generator.generate.return_value = supported_answer()
+
+    def slow_validation(answer, evidence):
+        validate_answer_references(answer, evidence)
+        now[0] = 105.0
+
+    monkeypatch.setattr(
+        "philosophy_influence_explorer.workflows."
+        "answer_workflow.validate_answer_references",
+        slow_validation,
+    )
+
+    with pytest.raises(ExecutionBudgetExceededError):
+        build_answer_workflow(retriever, generator).invoke(
+            {
+                "query_text": "question",
+                "execution_budget": budget,
+            }
+        )
+
+    retriever.retrieve.assert_called_once()
+    generator.generate.assert_called_once()

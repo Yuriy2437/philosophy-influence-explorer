@@ -17,6 +17,7 @@ from philosophy_influence_explorer.generation.gemini import (
 from philosophy_influence_explorer.retrieval.semantic_graph_retriever import (
     SemanticGraphResult,
 )
+from philosophy_influence_explorer.time_budget import ExecutionBudget
 
 
 @pytest.fixture
@@ -365,7 +366,7 @@ def test_answer_openapi_documents_security_and_response(setup_api) -> None:
     operation = document["paths"]["/api/v1/answers"]["post"]
 
     assert "requestBody" in operation
-    assert {"401", "422", "502", "503"} <= set(operation["responses"])
+    assert {"401", "422", "502", "503", "504"} <= set(operation["responses"])
     assert {"GenerationOperatorToken": []} in operation["security"]
 
     scheme = document["components"]["securitySchemes"]["GenerationOperatorToken"]
@@ -410,3 +411,127 @@ def test_unknown_reference_is_rejected_at_http_boundary(setup_api) -> None:
     assert "Unsupported synthetic assertion" not in response.text
     assert "passage:unknown" not in response.text
     generator.generate.assert_called_once()
+
+
+@pytest.mark.parametrize("stage", ["retrieval", "generation"])
+def test_budget_expiry_returns_sanitized_504(
+    setup_api,
+    monkeypatch: pytest.MonkeyPatch,
+    stage: str,
+) -> None:
+    app, _, retriever, generator, _, _ = setup_api
+    now = [100.0]
+    budget = ExecutionBudget(5.0, clock=lambda: now[0])
+
+    monkeypatch.setattr(
+        answers,
+        "ExecutionBudget",
+        lambda timeout_seconds: budget,
+    )
+
+    if stage == "retrieval":
+        result = retriever.retrieve.return_value
+
+        def slow_retrieve(*args, **kwargs):
+            assert kwargs["budget"] is budget
+            now[0] = 105.0
+            return result
+
+        retriever.retrieve.side_effect = slow_retrieve
+    else:
+        result = generator.generate.return_value
+
+        def slow_generate(*args, **kwargs):
+            now[0] = 105.0
+            return result
+
+        generator.generate.side_effect = slow_generate
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/api/v1/answers",
+            headers=authorization(),
+            json={"q": "Question"},
+        )
+
+    assert response.status_code == 504
+    assert response.headers["cache-control"] == "no-store"
+    assert response.json() == {
+        "detail": "Answer execution time budget exceeded."
+    }
+    assert "answer" not in response.json()
+    assert "google-test-key" not in response.text
+    assert "operator-test-token" not in response.text
+    retriever.retrieve.assert_called_once()
+
+    if stage == "retrieval":
+        generator.generate.assert_not_called()
+    else:
+        generator.generate.assert_called_once()
+
+
+def test_each_request_gets_a_new_configured_budget(
+    setup_api,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    app, settings, retriever, generator, _, _ = setup_api
+    settings.answer_workflow_timeout_seconds = 12.5
+    created_budgets = []
+
+    def make_budget(timeout_seconds):
+        assert timeout_seconds == 12.5
+        budget = ExecutionBudget(timeout_seconds, clock=lambda: 100.0)
+        created_budgets.append(budget)
+        return budget
+
+    monkeypatch.setattr(answers, "ExecutionBudget", make_budget)
+
+    with TestClient(app) as client:
+        for question in ("First question", "Second question"):
+            response = client.post(
+                "/api/v1/answers",
+                headers=authorization(),
+                json={"q": question},
+            )
+            assert response.status_code == 200
+
+    assert len(created_budgets) == 2
+    assert created_budgets[0] is not created_budgets[1]
+    assert retriever.retrieve.call_count == 2
+    assert generator.generate.call_count == 2
+
+    for call, budget in zip(
+        retriever.retrieve.call_args_list,
+        created_budgets,
+        strict=True,
+    ):
+        assert call.kwargs["budget"] is budget
+
+
+def test_expired_budget_prevents_service_construction(
+    setup_api,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    app, _, retriever, generator, retrieval_factory, generation_factory = setup_api
+    now = [100.0]
+    budget = ExecutionBudget(5.0, clock=lambda: now[0])
+    now[0] = 105.0
+
+    monkeypatch.setattr(
+        answers,
+        "ExecutionBudget",
+        lambda timeout_seconds: budget,
+    )
+
+    with TestClient(app) as client:
+        response = client.post(
+            "/api/v1/answers",
+            headers=authorization(),
+            json={"q": "Question"},
+        )
+
+    assert response.status_code == 504
+    retrieval_factory.assert_not_called()
+    generation_factory.assert_not_called()
+    retriever.retrieve.assert_not_called()
+    generator.generate.assert_not_called()

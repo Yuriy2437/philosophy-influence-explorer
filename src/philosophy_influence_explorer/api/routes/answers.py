@@ -31,6 +31,10 @@ from philosophy_influence_explorer.schemas.answers import (
 from philosophy_influence_explorer.workflows.answer_workflow import (
     build_answer_workflow,
 )
+from philosophy_influence_explorer.time_budget import (
+    ExecutionBudget,
+    ExecutionBudgetExceededError,
+)
 
 router = APIRouter(prefix="/answers", tags=["answers"])
 
@@ -73,6 +77,7 @@ def build_operator_answer_workflow(request: Request, settings: Settings):
         401: {"description": "Operator access is missing or invalid."},
         502: {"description": "An acceptable answer could not be produced."},
         503: {"description": "Generation or retrieval is unavailable."},
+        504: {"description": "The answer execution budget was exceeded."},
     },
 )
 def answer_post(
@@ -80,10 +85,16 @@ def answer_post(
     body: AnswerRequest,
     settings: Annotated[Settings, Depends(require_generation_access)],
 ) -> JSONResponse:
-    """Run one answer workflow without automatic retries."""
-    workflow = build_operator_answer_workflow(request, settings)
+    """Run one answer workflow with a cooperative execution budget."""
+    budget = ExecutionBudget(settings.answer_workflow_timeout_seconds)
 
     try:
+        budget.check()
+
+        workflow = build_operator_answer_workflow(request, settings)
+
+        budget.check()
+
         state = workflow.invoke(
             {
                 "query_text": body.q,
@@ -95,8 +106,11 @@ def answer_post(
                     is_verbatim=body.is_verbatim,
                     is_editorial=body.is_editorial,
                 ),
+                "execution_budget": budget,
             }
         )
+
+        budget.check()
 
         packet = state["evidence"]
         payload = AnswerResponse(
@@ -113,6 +127,23 @@ def answer_post(
                 ),
             ),
         )
+
+        budget.check()
+
+        response = JSONResponse(
+            content=payload.model_dump(mode="json"),
+            media_type="application/json; charset=utf-8",
+            headers={"Cache-Control": "no-store"},
+        )
+
+        budget.check()
+
+    except ExecutionBudgetExceededError:
+        raise HTTPException(
+            status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+            detail="Answer execution time budget exceeded.",
+            headers={"Cache-Control": "no-store"},
+        ) from None
     except GeminiAnswerGeneratorError:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
@@ -129,8 +160,4 @@ def answer_post(
             detail="Answer generation service is temporarily unavailable.",
         ) from None
 
-    return JSONResponse(
-        content=payload.model_dump(mode="json"),
-        media_type="application/json; charset=utf-8",
-        headers={"Cache-Control": "no-store"},
-    )
+    return response

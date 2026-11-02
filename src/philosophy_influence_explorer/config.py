@@ -66,6 +66,11 @@ class Settings(BaseSettings):
         gt=0,
         allow_inf_nan=False,
     )
+    answer_workflow_timeout_seconds: float = Field(
+        default=120.0,
+        gt=0,
+        allow_inf_nan=False,
+    )
 
     embedding_provider: str = "ollama"
     embedding_model: str = "bge-m3:567m"
