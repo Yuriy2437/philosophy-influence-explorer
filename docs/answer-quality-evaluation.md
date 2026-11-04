@@ -77,6 +77,35 @@ not the absence of relevant knowledge or sources elsewhere.
 Candidate review statuses remain candidate.
 Generated explanations are not published translations.
 
+## Manual review conventions
+
+Review each answer against the supplied evidence, not against an
+unrestricted expectation of what the model may know about the topic.
+
+Required points and limitations are semantic criteria.
+Equivalent wording is acceptable; exact phrase matching is not required.
+
+An answered status may include limitations that accurately define
+the scope of an otherwise complete answer to the question.
+
+For answer-q1, review requirements depend on the returned status:
+
+- partial must accurately state the humanity-as-end principle,
+  preserve never merely as a means, and identify the missing justification.
+- insufficient_evidence must explain the missing justification
+  without claims, as required by the answer contract.
+
+For answer-negative-n1, related statements about the practical
+imperative or autonomy do not count as a partial answer to the
+requested hypothetical-versus-categorical comparison.
+
+The q1 and paraphrase-p1 source labels do not imply equivalent
+answerability: one question asks why, while the other asks how to act.
+
+Preserve source review metadata. Approval of this rubric does not
+promote candidate passages to reviewed status or independently
+verify quotations, editions, or translations.
+
 ## Fixed evidence construction
 
 build_fixed_evidence selects local corpus passages in the exact order

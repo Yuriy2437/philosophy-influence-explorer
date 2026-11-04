@@ -18,7 +18,7 @@
         "Presenting a restatement of the imperative as a complete explanation of why it holds.",
         "Adding an argument from dignity, rational nature, autonomy, or intrinsic worth that is not established in the supplied excerpt."
       ],
-      "rationale": "The question asks for a justification, not merely the content of the principle. A partial answer may accurately state the principle only while explicitly identifying the missing justification. An insufficient-evidence answer must explain that gap."
+      "rationale": "The question asks for a justification, not merely the content of the principle. For partial status, the answer must accurately state that humanity is to be treated as an end and never merely as a means, while explicitly identifying the missing justification. For insufficient_evidence status, the answer must explain that gap without claims. These are status-dependent semantic requirements, not automatic checks."
     },
     {
       "id": "answer-paraphrase-p1",
@@ -65,7 +65,9 @@
         "Someone's own good alone is not that stated justification.",
         "Keep the answer scoped to the quoted formulation, which refers to a member of a civilised community."
       ],
-      "required_limitations": [],
+      "required_limitations": [
+        "The excerpt identifies preventing harm to others as the only permissible purpose of coercion within its stated scope; it does not establish that any risk or any proposed coercive measure is sufficient for justification."
+      ],
       "forbidden_inferences": [
         "Claiming that any risk to another person automatically justifies any coercive measure.",
         "Adding exceptions, legal tests, or an account of harm not supplied by the excerpt.",
@@ -98,7 +100,7 @@
       "evidence_passage_ids": ["passage:cusanus:ddi:1.1:la"],
       "allowed_answer_statuses": ["answered"],
       "required_points": [
-        "The excerpt links inquiry to comparative proportional relations.",
+        "The excerpt describes inquiry as easy within comparative proportional relations and difficult when it reaches the infinite.",
         "The infinite escapes every proportion, which is the stated basis for calling it incomprehensible in this context."
       ],
       "required_limitations": [],
