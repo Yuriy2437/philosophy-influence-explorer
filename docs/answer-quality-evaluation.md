@@ -12,6 +12,8 @@ It is not an independent benchmark or scholarly certification.
 - data/evaluation/answer-quality-v1.json
 - src/philosophy_influence_explorer/evaluation/answer_dataset.py
 - tests/test_answer_evaluation_dataset.py
+- src/philosophy_influence_explorer/evaluation/answer_evidence.py
+- tests/test_answer_evaluation_evidence.py
 
 Existing semantic-search datasets and historical judgments are unchanged.
 
@@ -71,9 +73,39 @@ not the absence of relevant knowledge or sources elsewhere.
 Candidate review statuses remain candidate.
 Generated explanations are not published translations.
 
+## Fixed evidence construction
+
+build_fixed_evidence selects local corpus passages in the exact order
+specified by evidence_passage_ids.
+
+It preserves the text and all provenance fields supported by
+GraphContextPassage, including text kind and review status.
+It does not promote candidate records to reviewed status.
+
+The function rejects:
+
+- Empty selections.
+- Blank or untrimmed selected IDs.
+- Duplicate selected IDs.
+- Unknown selected IDs.
+- Duplicate passage IDs in the supplied corpus collection.
+
+The resulting EvidencePacket contains manually selected passages.
+Both semantic_passage_ids and additional_graph_passage_ids are empty:
+no semantic retrieval or graph expansion took place.
+
+This intentionally differs from production retrieval packets.
+The generator receives the passages but no claimed retrieval membership.
+
+Fields present only in PassageRecord, such as license_status and
+position_label, are not included in GraphContextPassage.
+The packet is not a complete bibliographic or licensing snapshot.
+
+The function does not call external services or modify input records.
+Tests build packets for all eight repository evaluation cases.
+
 ## Not implemented in this increment
 
-- EvidencePacket construction for evaluation.
 - Live generation runner.
 - Answer report generation and manual verdict storage.
 - End-to-end answer-workflow evaluation.
