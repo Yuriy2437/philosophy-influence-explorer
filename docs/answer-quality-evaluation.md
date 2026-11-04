@@ -18,6 +18,8 @@ It is not an independent benchmark or scholarly certification.
 - tests/test_answer_evaluation_runner.py
 - src/philosophy_influence_explorer/evaluation/answer_report.py
 - tests/test_answer_evaluation_report.py
+- src/philosophy_influence_explorer/evaluation/answer_cli.py
+- tests/test_answer_evaluation_cli.py
 
 Existing semantic-search datasets and historical judgments are unchanged.
 
@@ -211,11 +213,70 @@ protection, serialization failures, and missing parent directories.
 JSON arrays represent both Python lists and tuples.
 The round-trip comparison uses the JSON-normalized report.
 
+## Explicitly gated Gemini evaluation command
+
+The answer_cli module runs one explicitly selected evaluation case
+through the existing GeminiAnswerGenerator and saves a JSON report.
+
+The command requires:
+
+- An explicit case ID.
+- An explicit bare model ID, without a Production-default fallback.
+- An output path whose parent directory already exists.
+- The --allow-network flag.
+- GOOGLE_API_KEY in the process environment.
+
+The command does not automatically load .env or instantiate application
+Settings. It does not use retrieval, embeddings, Neo4j, or the API route.
+Production generation settings are unchanged.
+
+Before generation, it checks the network gate, destination path,
+selected case, local dataset, and generator configuration.
+The runner prepares fixed evidence before calling the generator.
+
+The output-path check is not a reservation. Exclusive creation during
+saving prevents overwriting a file that appears after the preflight.
+A saving failure may occur after a provider request has completed.
+Report writing remains non-atomic.
+
+The report includes:
+
+- The requested model ID, not a verified serving-model version.
+- UTC start and finish timestamps around the runner execution.
+- The selected case ID.
+- HTTP timeout and input-byte limit.
+- Runner and adapter retry counts, both zero.
+- A SHA-256 hash of the UTF-8 system instruction.
+- An indication that rejected provider output is not retained.
+
+The API key is not added to report metadata.
+Case criteria are retained in the report but are not sent to Gemini.
+
+The existing adapter performs at most one HTTP request per generate call,
+without retries. Input validation may reject a call before HTTP.
+The configured HTTP timeout is not a total evaluation deadline.
+
+The adapter validates answer structure and reference membership before
+returning. Answers rejected there appear as generation-stage errors in
+the runner report; their original provider output is not retained.
+
+Exit codes:
+
+- 0: The report was saved and all automatic checks passed.
+  Manual semantic review is still pending.
+- 1: The report was saved, but a case error or failed automatic check
+  was recorded.
+- 2: Argument parsing, setup, or report saving failed.
+
+Tests substitute HTTP responses and do not call the live provider.
+The --allow-network flag is an explicit local execution gate,
+not Production authentication or authorization.
+
 ## Not implemented in this increment
 
 - A workflow for entering and validating completed manual reviews.
 - Atomic report-file publication.
-- Live-provider execution and configuration.
+- A completed live-provider evaluation run and manual review of its answers.
 - End-to-end answer-workflow evaluation.
 - Corpus snapshot comparison with Aura.
 - Model-based judging.
