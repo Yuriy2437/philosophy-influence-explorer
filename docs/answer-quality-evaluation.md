@@ -14,6 +14,8 @@ It is not an independent benchmark or scholarly certification.
 - tests/test_answer_evaluation_dataset.py
 - src/philosophy_influence_explorer/evaluation/answer_evidence.py
 - tests/test_answer_evaluation_evidence.py
+- src/philosophy_influence_explorer/evaluation/answer_runner.py
+- tests/test_answer_evaluation_runner.py
 
 Existing semantic-search datasets and historical judgments are unchanged.
 
@@ -104,10 +106,56 @@ The packet is not a complete bibliographic or licensing snapshot.
 The function does not call external services or modify input records.
 Tests build packets for all eight repository evaluation cases.
 
+## Provider-independent evaluation runner
+
+run_answer_evaluation accepts an AnswerSuite, local corpus passages,
+and an AnswerGenerator. It returns a JSON-compatible diagnostic report
+without configuring a provider or writing files.
+
+The runner revalidates the suite and prepares every fixed-evidence
+packet before calling the generator. Invalid suite or evidence data
+aborts the run before any generator call.
+
+Each case receives one generator call, without runner-level retries.
+Ordinary generation and answer-validation exceptions are recorded
+per case; later cases continue. KeyboardInterrupt is not swallowed.
+
+Each result includes:
+
+- A snapshot of the complete case, including its review criteria.
+- The supplied evidence packet and its SHA-256 hash.
+- Generator-call duration in seconds.
+- A draft answer when the returned GroundedAnswer can be serialized.
+- An answer that passed structure and reference-membership checks.
+- Separate structure, reference-membership, and allowed-status checks.
+- Error stage, exception type, and message when applicable.
+- Empty manual-review verdict and notes.
+
+A null check means the check was not performed.
+A disallowed answer status is recorded as status_allowed=false,
+not as an execution error. The structurally valid answer is retained
+if its references belong to the supplied evidence.
+
+The runner revalidates serialized GroundedAnswer output rather than
+trusting an existing model instance. Reference validation establishes
+passage-ID membership only, not entailment or scholarly correctness.
+
+The evidence hash covers the complete ordered packet using UTF-8 JSON
+with ensure_ascii=false, sort_keys=true, separators=(',', ':'),
+and allow_nan=false. It identifies the evidence snapshot, not the
+complete experiment.
+
+Tests use a substituted generator and local corpus data.
+No live provider call or automatic semantic grading is performed.
+
+The runner does not implement timeouts, report-file persistence,
+a CLI, or live-provider configuration. A supplied generator may itself
+use external services or implement internal retries.
+
 ## Not implemented in this increment
 
-- Live generation runner.
-- Answer report generation and manual verdict storage.
+- Report-file persistence and completed manual-review storage.
+- Live-provider execution and configuration.
 - End-to-end answer-workflow evaluation.
 - Corpus snapshot comparison with Aura.
 - Model-based judging.
