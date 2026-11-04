@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "suite_id": "answer-quality-v1",
+  "mode": "fixed_evidence",
+  "description": "Draft AI-assisted regression rubric for answers using fixed local corpus passages. Pending explicit approval by the project author. Not an independent benchmark or scholarly certification. Status checks do not replace manual semantic review.",
+  "cases": [
+    {
+      "id": "answer-q1",
+      "source_case_id": "q1",
+      "query": "Why should a person be treated as an end rather than merely as a means?",
+      "evidence_passage_ids": ["passage:kant:groundwork:2:humanity:en"],
+      "allowed_answer_statuses": ["partial", "insufficient_evidence"],
+      "required_points": [],
+      "required_limitations": [
+        "The supplied excerpt states the practical imperative but does not provide the requested justification for it."
+      ],
+      "forbidden_inferences": [
+        "Presenting a restatement of the imperative as a complete explanation of why it holds.",
+        "Adding an argument from dignity, rational nature, autonomy, or intrinsic worth that is not established in the supplied excerpt."
+      ],
+      "rationale": "The question asks for a justification, not merely the content of the principle. A partial answer may accurately state the principle only while explicitly identifying the missing justification. An insufficient-evidence answer must explain that gap."
+    },
+    {
+      "id": "answer-paraphrase-p1",
+      "source_case_id": "paraphrase-p1",
+      "query": "Как следует поступать с другим человеком, чтобы не превращать его лишь в инструмент своих целей?",
+      "evidence_passage_ids": ["passage:kant:groundwork:2:humanity:en"],
+      "allowed_answer_statuses": ["answered"],
+      "required_points": [
+        "Treat humanity in another person as an end, never merely as a means.",
+        "Preserve the qualification merely or only rather than prohibiting every instrumental interaction."
+      ],
+      "required_limitations": [],
+      "forbidden_inferences": [
+        "Claiming that every use of another person's assistance is forbidden.",
+        "Presenting a generated Russian rendering as a published or independently verified translation."
+      ],
+      "rationale": "Unlike q1, this question asks how to act, which the supplied imperative directly addresses. The English passage is from the Abbott translation and retains candidate review status."
+    },
+    {
+      "id": "answer-q2",
+      "source_case_id": "q2",
+      "query": "What does it mean for the will to give itself a universal law?",
+      "evidence_passage_ids": ["passage:kant:groundwork:2:autonomy:en"],
+      "allowed_answer_statuses": ["answered"],
+      "required_points": [
+        "Autonomy is the property of the will by which it is a law to itself, independently of properties of the objects of volition.",
+        "The principle connects choosing with maxims of choice being comprehended as a universal law."
+      ],
+      "required_limitations": [],
+      "forbidden_inferences": [
+        "Equating autonomy with arbitrary preference or permission to do whatever one wants.",
+        "Supplying a broader derivation of Kant's moral philosophy that is absent from the excerpt."
+      ],
+      "rationale": "The excerpt supplies both a definition of autonomy and a formulation of its principle. The answer must remain attributable to the supplied candidate-status passage."
+    },
+    {
+      "id": "answer-paraphrase-p2",
+      "source_case_id": "paraphrase-p2",
+      "query": "Is someone's own good enough to justify forcing them to act, or must other people be at risk?",
+      "evidence_passage_ids": ["passage:mill:on-liberty:1:harm:en"],
+      "allowed_answer_statuses": ["answered"],
+      "required_points": [
+        "In the quoted principle, preventing harm to others is the only purpose that justifies exercising power against someone's will.",
+        "Someone's own good alone is not that stated justification.",
+        "Keep the answer scoped to the quoted formulation, which refers to a member of a civilised community."
+      ],
+      "required_limitations": [],
+      "forbidden_inferences": [
+        "Claiming that any risk to another person automatically justifies any coercive measure.",
+        "Adding exceptions, legal tests, or an account of harm not supplied by the excerpt.",
+        "Generalizing the quotation into an unrestricted rule for all people and circumstances."
+      ],
+      "rationale": "The only-purpose formulation supports the requested distinction but does not specify a complete test of when a particular coercive act is justified. Source wording can be attributed without endorsing its historical terminology."
+    },
+    {
+      "id": "answer-q5",
+      "source_case_id": "q5",
+      "query": "How is becoming related to being and nothing?",
+      "evidence_passage_ids": ["passage:hegel:wl:being:de"],
+      "allowed_answer_statuses": ["answered"],
+      "required_points": [
+        "Becoming is characterized as the inseparability of being and nothing.",
+        "It is this determinate unity, not a unity that abstracts from being and nothing."
+      ],
+      "required_limitations": [],
+      "forbidden_inferences": [
+        "Replacing the meaning of abstracts from with derived from or originates from.",
+        "Adding a thesis-antithesis-synthesis explanation absent from the excerpt.",
+        "Treating the fragment as evidence of historical influence between authors."
+      ],
+      "rationale": "The German excerpt directly addresses the relation. A previous live answer used the less precise phrase derived from; this case checks preservation of the contrast with abstraction."
+    },
+    {
+      "id": "answer-q6",
+      "source_case_id": "q6",
+      "query": "Почему бесконечное нельзя постичь через сравнение и пропорцию?",
+      "evidence_passage_ids": ["passage:cusanus:ddi:1.1:la"],
+      "allowed_answer_statuses": ["answered"],
+      "required_points": [
+        "The excerpt links inquiry to comparative proportional relations.",
+        "The infinite escapes every proportion, which is the stated basis for calling it incomprehensible in this context."
+      ],
+      "required_limitations": [],
+      "forbidden_inferences": [
+        "Concluding that no meaningful statement about the infinite is possible.",
+        "Adding mathematical proofs or a broader theory of finite intellect absent from the supplied excerpt.",
+        "Presenting a generated Russian explanation as a published translation."
+      ],
+      "rationale": "The Latin passage supplies the requested connection between the limits of proportional comparison and the incomprehensibility of the infinite."
+    },
+    {
+      "id": "answer-negative-n1",
+      "source_case_id": "negative-n1",
+      "query": "How does Kant distinguish a hypothetical imperative from a categorical imperative?",
+      "evidence_passage_ids": [
+        "passage:kant:groundwork:2:humanity:en",
+        "passage:kant:groundwork:2:autonomy:en"
+      ],
+      "allowed_answer_statuses": ["insufficient_evidence"],
+      "required_points": [],
+      "required_limitations": [
+        "The supplied excerpts discuss the practical imperative and autonomy but do not define and compare hypothetical and categorical imperatives."
+      ],
+      "forbidden_inferences": [
+        "Providing the missing distinction from background knowledge and citing these excerpts as its support.",
+        "Treating thematic relevance to Kantian ethics as sufficient evidence for the requested comparison."
+      ],
+      "rationale": "Evidence is nonempty and thematically related, but it does not supply the requested comparison. Under the existing answer contract, insufficient_evidence contains no claims."
+    },
+    {
+      "id": "answer-negative-n3",
+      "source_case_id": "negative-n3",
+      "query": "What experimental evidence supports quantum entanglement?",
+      "evidence_passage_ids": [
+        "passage:cusanus:ddi:1.4:la",
+        "passage:cusanus:ddi:1.1:la",
+        "passage:mill:on-liberty:1:harm:en"
+      ],
+      "allowed_answer_statuses": ["insufficient_evidence"],
+      "required_points": [],
+      "required_limitations": [
+        "The supplied passages do not describe experiments or experimental evidence concerning quantum entanglement."
+      ],
+      "forbidden_inferences": [
+        "Answering from background physics knowledge while citing the supplied philosophical passages.",
+        "Using coincidence, infinity, or comparison as experimental evidence for quantum entanglement.",
+        "Inferring that no experimental evidence exists merely because none is present in the supplied passages."
+      ],
+      "rationale": "The fixed evidence is nonempty but irrelevant to the requested empirical question. The limitation concerns the provided evidence, not the existence of evidence elsewhere."
+    }
+  ]
+}
