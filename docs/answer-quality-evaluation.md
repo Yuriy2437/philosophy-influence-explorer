@@ -16,6 +16,8 @@ It is not an independent benchmark or scholarly certification.
 - tests/test_answer_evaluation_evidence.py
 - src/philosophy_influence_explorer/evaluation/answer_runner.py
 - tests/test_answer_evaluation_runner.py
+- src/philosophy_influence_explorer/evaluation/answer_report.py
+- tests/test_answer_evaluation_report.py
 
 Existing semantic-search datasets and historical judgments are unchanged.
 
@@ -152,9 +154,38 @@ The runner does not implement timeouts, report-file persistence,
 a CLI, or live-provider configuration. A supplied generator may itself
 use external services or implement internal retries.
 
+## JSON report persistence
+
+save_answer_report saves a supplied report to a new UTF-8 JSON file.
+It is separate from the runner and does not execute generation,
+validate the report schema, or assign manual-review verdicts.
+
+The output uses readable indentation, unescaped Unicode, no UTF-8 BOM,
+and a final LF newline. Non-finite numbers are rejected.
+
+Serialization completes before the destination is opened.
+A serialization failure does not create a destination file.
+The destination is opened in exclusive creation mode: existing files,
+including empty files, are never overwritten.
+
+Parent directories must already exist.
+Filesystem errors propagate to the caller.
+Writing is not atomic: an I/O failure after file creation may leave
+an incomplete report.
+
+Tests save and reload a complete runner report produced with a
+substituted generator and local corpus data. They cover recorded
+generation errors, successful structured answers, evidence snapshots,
+hash preservation, empty manual-review fields, Unicode, overwrite
+protection, serialization failures, and missing parent directories.
+
+JSON arrays represent both Python lists and tuples.
+The round-trip comparison uses the JSON-normalized report.
+
 ## Not implemented in this increment
 
-- Report-file persistence and completed manual-review storage.
+- A workflow for entering and validating completed manual reviews.
+- Atomic report-file publication.
 - Live-provider execution and configuration.
 - End-to-end answer-workflow evaluation.
 - Corpus snapshot comparison with Aura.
