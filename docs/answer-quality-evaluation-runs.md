@@ -3,8 +3,7 @@
 ## Status and scope
 
 This document records execution outcomes and AI-assisted semantic reviews
-of selected live evaluation attempts using the draft answer-quality-v1
-rubric.
+of live evaluation attempts using the draft answer-quality-v1 rubric.
 
 These assessments are not independent scholarly reviews, project-author
 approval of the rubric, or evidence of general model quality.
@@ -16,33 +15,46 @@ entry or storage workflow.
 Automatic checks cover answer structure, passage-ID membership,
 and allowed answer status. They do not establish semantic fidelity.
 
-The reports are stored locally under the ignored exports/ directory.
-They are not committed to the repository. The identities below allow
-a local report to be matched by case ID, execution timestamp,
-and evidence hash.
+Reports are stored locally under the ignored exports/ directory.
+They are not committed to the repository. Match a local report using
+case ID, execution timestamp, and evidence hash.
 
 ## Summary
 
-| Case ID              | Attempt               | UTC start                        | Automatic checks        | AI-assisted semantic assessment               |
-| -------------------- | --------------------- | -------------------------------- | ----------------------- | --------------------------------------------- |
-| answer-negative-n3   | Initial               | 2026-11-04T13:29:46.662238+00:00 | Passed                  | Meets the current draft case criteria         |
-| answer-q5            | Initial               | 2026-11-05T09:47:13.641754+00:00 | Passed                  | Does not meet the current draft case criteria |
-| answer-q1            | Initial               | 2026-11-05T12:21:07.584697+00:00 | Not performed: HTTP 503 | Not assessable: no answer returned            |
-| answer-q1            | Separate manual retry | 2026-11-05T12:23:54.853712+00:00 | Passed                  | Meets the current draft case criteria         |
-| answer-paraphrase-p1 | Initial               | 2026-11-05T12:26:59.818864+00:00 | Not performed: HTTP 503 | Not assessable: no answer returned            |
+| Case ID              | Attempt               | UTC start                        | Automatic checks        | AI-assisted semantic assessment                 |
+| -------------------- | --------------------- | -------------------------------- | ----------------------- | ----------------------------------------------- |
+| answer-negative-n3   | Initial               | 2026-11-04T13:29:46.662238+00:00 | Passed                  | Meets draft criteria                            |
+| answer-q5            | Initial               | 2026-11-05T09:47:13.641754+00:00 | Passed                  | Does not meet draft criteria                    |
+| answer-q1            | Initial               | 2026-11-05T12:21:07.584697+00:00 | Not performed: HTTP 503 | Not assessable                                  |
+| answer-q1            | Separate manual retry | 2026-11-05T12:23:54.853712+00:00 | Passed                  | Meets draft criteria                            |
+| answer-paraphrase-p1 | Initial               | 2026-11-05T12:26:59.818864+00:00 | Not performed: HTTP 503 | Not assessable                                  |
+| answer-paraphrase-p1 | Separate manual retry | 2026-11-05T12:51:04.336366+00:00 | Passed                  | Meets core draft criteria with a wording caveat |
+| answer-q2            | Initial               | 2026-11-05T13:19:40.434260+00:00 | Passed                  | Meets draft criteria                            |
+| answer-paraphrase-p2 | Initial               | 2026-11-05T13:24:04.966754+00:00 | Passed                  | Does not meet draft criteria                    |
+| answer-q6            | Initial               | 2026-11-05T13:25:50.320847+00:00 | Passed                  | Meets draft criteria with a wording caveat      |
+| answer-negative-n1   | Initial               | 2026-11-05T13:27:50.560560+00:00 | Not performed: HTTP 503 | Not assessable                                  |
+| answer-negative-n1   | Separate manual retry | 2026-11-05T13:29:41.608452+00:00 | Not performed: HTTP 503 | Not assessable                                  |
 
-Five attempts cover four distinct cases.
+Eleven attempts cover all eight distinct cases.
 
-Three attempts returned answers that passed automatic checks.
-Of those answers, two meet the current draft semantic criteria
-and one does not, according to AI-assisted review.
+Seven attempts returned answers, all of which passed automatic checks.
+AI-assisted review assessed three answers as meeting the draft criteria
+without a noted wording caveat, two as meeting them with wording caveats,
+and two as not meeting them.
 
-Two attempts ended with HTTP 503 and produced no answer.
-These are execution failures, not semantic failures.
+Four attempts ended with HTTP 503 and produced no answer.
+They are execution failures, not semantic failures.
 
-This is not a complete eight-case evaluation or a statistical estimate
-of reliability. The q1/paraphrase-p1 contrast remains incomplete because
-paraphrase-p1 has not returned an assessable answer.
+Seven distinct cases have assessable answers. The remaining case,
+answer-negative-n1, has no assessable answer after two attempts.
+
+The q1/paraphrase-p1 contrast has been observed in returned answers:
+q1 returned partial with a missing-justification limitation, while
+paraphrase-p1 returned answered with a Russian restatement of the principle.
+
+This is not a complete semantic evaluation of all eight cases,
+a statistical estimate of reliability, or evidence of stable behavior
+across repeated samples.
 
 ## Shared execution context
 
@@ -58,14 +70,26 @@ paraphrase-p1 has not returned an assessable answer.
 - Retrieval membership lists were empty.
 - No retrieval or graph expansion was performed by the evaluation command.
 
-The second q1 attempt was a separate manual invocation after an HTTP 503.
-It was not an automatic retry within the first attempt.
+Retries of q1, paraphrase-p1, and negative-n1 were separate manual
+invocations after execution errors. They were not automatic retries
+within the preceding attempts.
 
 System instruction SHA-256 for every attempt:
 
 ```text
 da9f8bf938a147e993c38a66ff4e829adcc44effa5c0dd1452c901cbba87b4d2
 ```
+
+For every recorded HTTP 503:
+
+- Error stage: generation.
+- Error type: GeminiAnswerGeneratorError.
+- Error message: Gemini generation request failed (HTTP 503).
+- Both draft_answer and answer are null.
+- All automatic check values are null, meaning not performed.
+
+The provider response body was not retained. The exact server-side
+cause of these failures cannot be established from the reports.
 
 ## Run: answer-negative-n3
 
@@ -86,8 +110,6 @@ Evidence SHA-256:
 
 ### Question and evidence
 
-Question:
-
 > What experimental evidence supports quantum entanglement?
 
 Supplied passage IDs:
@@ -98,9 +120,7 @@ Supplied passage IDs:
 
 ### Observed answer
 
-Status: insufficient_evidence.
-
-Claims: empty.
+Status: insufficient_evidence. Claims: empty.
 
 Limitation:
 
@@ -108,20 +128,15 @@ Limitation:
 
 ### Assessment
 
-The answer meets the current draft case criteria:
+Meets the current draft criteria.
 
-- It identifies the absence of the requested experimental information
-  in the supplied passages.
-- It does not answer from background physics knowledge.
-- It does not present philosophical terminology as experimental evidence.
-- It does not infer that experimental evidence is absent everywhere.
+The answer identifies missing experimental information in the supplied
+passages. It does not introduce background physics knowledge, present
+philosophical terminology as experimental evidence, or infer that
+experimental evidence is absent everywhere.
 
-All automatic checks passed. With no claims, reference validity means
-that no out-of-packet references occur; it does not demonstrate the
-ability to support substantive claims with citations.
-
-This is an AI-assisted assessment of the supplied report.
-Project-author semantic approval has not been recorded.
+With no claims, reference validity means that no out-of-packet references
+occur. It does not demonstrate support for substantive cited claims.
 
 ## Run: answer-q5
 
@@ -142,8 +157,6 @@ Evidence SHA-256:
 
 ### Question and evidence
 
-Question:
-
 > How is becoming related to being and nothing?
 
 Supplied passage ID:
@@ -156,7 +169,7 @@ Supplied text:
 
 ### Observed answer
 
-Status: answered.
+Status: answered. Limitations: empty.
 
 Claim:
 
@@ -166,44 +179,30 @@ Referenced passage ID:
 
 - passage:hegel:wl:being:de
 
-Limitations: empty.
-
 ### Assessment
 
-The answer does not meet the current draft case criteria.
+Does not meet the current draft criteria.
 
-It conveys the inseparability of being and nothing and identifies
-a specific unity. However, it replaces the contrast with a unity
-that abstracts from being and nothing with the phrase
-"an abstract unity derived from them".
+The answer conveys inseparability and a specific unity. However,
+"an abstract unity derived from them" does not preserve the contrast
+with a unity that abstracts from being and nothing.
 
 The source phrase is:
 
 > nicht die Einheit, welche vom Seyn und Nichts abstrahirt
 
-"Derived from" does not preserve "abstracts from", including within
-the negative contrast introduced by "rather than".
+The negative contrast introduced by "rather than" does not correct
+the substitution of derived from for abstracts from.
 
-This fails the second required semantic point and violates the
-explicit prohibition against replacing "abstracts from" with
-"derived from" or "originates from".
+This fails the second required semantic point and violates the explicit
+prohibition against that substitution.
 
-The word "undivideness" is also awkward English, but it is not the
-decisive reason for the failed assessment.
-
+"Undivideness" is awkward English but is not the decisive failure.
 No thesis-antithesis-synthesis account or historical-influence claim
 was added.
 
-All automatic checks passed because:
-
-- The output has valid answer structure.
-- Its passage ID belongs to the supplied packet.
-- The status answered is allowed by the case.
-
-Those checks do not detect the semantic substitution.
-
-This is an AI-assisted assessment of the supplied report.
-Project-author semantic approval has not been recorded.
+The valid structure, reference membership, and allowed status do not
+detect the semantic error.
 
 ## Run: answer-q1, initial attempt
 
@@ -214,6 +213,7 @@ Project-author semantic approval has not been recorded.
 - UTC finish: 2026-11-05T12:21:16.985257+00:00.
 - Generator-call duration: approximately 9.40 seconds.
 - CLI exit code: 1.
+- Outcome: HTTP 503; no answer.
 
 Evidence SHA-256:
 
@@ -223,44 +223,24 @@ e540f483a30a4f01b68cc3bc5e4bbd45d8dc17411b4620c824fab99c0c969671
 
 ### Question and evidence
 
-Question:
-
 > Why should a person be treated as an end rather than merely as a means?
 
 Supplied passage ID:
 
 - passage:kant:groundwork:2:humanity:en
 
-### Observed outcome
-
-Error stage: generation.
-
-Error type: GeminiAnswerGeneratorError.
-
-Error message:
-
-> Gemini generation request failed (HTTP 503).
-
-Both draft_answer and answer are null.
-All automatic check values are null: the checks were not performed.
-
 ### Assessment
 
-No answer is available for semantic review.
-Record this attempt as an execution failure, not as a failed semantic
-answer or an insufficient_evidence response.
+Not assessable. This is an execution failure, not a semantic failure
+or an insufficient_evidence answer.
 
-The HTTP status is retained, but the provider response body is not.
-The exact server-side cause cannot be established from this report.
-
-The report remains part of the record despite the later successful
-manual retry.
+Retain this report despite the later successful manual retry.
 
 ## Run: answer-q1, separate manual retry
 
 ### Identity
 
-- Attempt: separate manual retry after the initial HTTP 503.
+- Attempt: separate manual retry after HTTP 503.
 - UTC start: 2026-11-05T12:23:54.853712+00:00.
 - UTC finish: 2026-11-05T12:23:57.602427+00:00.
 - Generator-call duration: approximately 2.75 seconds.
@@ -274,8 +254,6 @@ e540f483a30a4f01b68cc3bc5e4bbd45d8dc17411b4620c824fab99c0c969671
 ```
 
 ### Question and evidence
-
-Question:
 
 > Why should a person be treated as an end rather than merely as a means?
 
@@ -305,22 +283,17 @@ Limitation:
 
 ### Assessment
 
-The answer meets the current draft criteria for partial status:
+Meets the current draft criteria for partial status.
 
-- It accurately restates the humanity-as-end principle.
-- It preserves never merely as a means through never as means only.
-- It explicitly identifies the absence of the requested justification.
-- It does not present the restatement as a complete explanation.
-- It does not add an unsupported argument from dignity, rational nature,
-  autonomy, or intrinsic worth.
+The answer preserves the humanity-as-end principle and never merely
+as a means. It explicitly identifies the missing justification and
+does not present the restatement as a complete explanation.
 
-All automatic checks passed.
+No unsupported argument from dignity, rational nature, autonomy,
+or intrinsic worth was added.
 
-The source review status remains candidate.
-This assessment does not independently verify the quotation or edition.
-
-This is an AI-assisted assessment of the supplied report.
-Project-author semantic approval has not been recorded.
+The source review status remains candidate. This assessment does not
+independently verify the quotation or edition.
 
 ## Run: answer-paraphrase-p1, initial attempt
 
@@ -331,6 +304,7 @@ Project-author semantic approval has not been recorded.
 - UTC finish: 2026-11-05T12:27:01.994762+00:00.
 - Generator-call duration: approximately 2.18 seconds.
 - CLI exit code: 1.
+- Outcome: HTTP 503; no answer.
 
 Evidence SHA-256:
 
@@ -340,7 +314,38 @@ e540f483a30a4f01b68cc3bc5e4bbd45d8dc17411b4620c824fab99c0c969671
 
 ### Question and evidence
 
-Question:
+> Как следует поступать с другим человеком, чтобы не превращать его лишь в инструмент своих целей?
+
+Supplied passage ID:
+
+- passage:kant:groundwork:2:humanity:en
+
+### Assessment
+
+Not assessable. The Russian rendering and preservation of merely
+or only could not be reviewed for this attempt.
+
+Do not infer a semantic-performance difference from the HTTP failure.
+A later separate attempt returned an assessable answer.
+
+## Run: answer-paraphrase-p1, separate manual retry
+
+### Identity
+
+- Attempt: separate manual retry after HTTP 503.
+- UTC start: 2026-11-05T12:51:04.336366+00:00.
+- UTC finish: 2026-11-05T12:51:06.243905+00:00.
+- Generator-call duration: approximately 1.91 seconds.
+- CLI exit code: 0.
+- Report error: null.
+
+Evidence SHA-256:
+
+```text
+e540f483a30a4f01b68cc3bc5e4bbd45d8dc17411b4620c824fab99c0c969671
+```
+
+### Question and evidence
 
 > Как следует поступать с другим человеком, чтобы не превращать его лишь в инструмент своих целей?
 
@@ -348,33 +353,299 @@ Supplied passage ID:
 
 - passage:kant:groundwork:2:humanity:en
 
-The evidence hash matches both q1 attempts. The question and case criteria
-differ; the evidence hash does not identify the complete experiment.
+The evidence hash matches both q1 attempts and the initial p1 attempt.
+Questions and criteria differ; an evidence hash does not identify
+the complete experiment.
 
-### Observed outcome
+### Observed answer
 
-Error stage: generation.
+Status: answered. Limitations: empty.
 
-Error type: GeminiAnswerGeneratorError.
+Claim:
 
-Error message:
+> Согласно практическому императиву, другого человека (как и самого себя) следует всегда воспринимать как цель, а не только как средство.
 
-> Gemini generation request failed (HTTP 503).
+Referenced passage ID:
 
-Both draft_answer and answer are null.
-All automatic check values are null: the checks were not performed.
+- passage:kant:groundwork:2:humanity:en
 
 ### Assessment
 
-No answer is available for semantic review.
-Record this attempt as an execution failure, not a semantic failure.
+Meets the core draft criteria with a wording caveat.
 
-The Russian rendering, preservation of merely or only, and distinction
-between a generated explanation and a published translation could not
+The answer is in Russian, preserves the qualification not only as
+a means, does not prohibit every instrumental interaction, and does not
+claim to be a published or independently verified translation.
+
+However, воспринимать is weaker than the source instruction
+"So act as to treat". It can shift emphasis from conduct toward
+perception. Обращаться с would be a more precise rendering here.
+
+Record the caveat rather than treating the wording as fully precise.
+The generated answer remains unchanged.
+
+Together with the successful q1 retry, this provides one observed
+contrast between stating a principle and supplying its justification.
+It does not demonstrate stable behavior across repeated samples.
+
+## Run: answer-q2
+
+### Identity
+
+- Attempt: initial.
+- UTC start: 2026-11-05T13:19:40.434260+00:00.
+- UTC finish: 2026-11-05T13:19:42.339977+00:00.
+- Generator-call duration: approximately 1.90 seconds.
+- CLI exit code: 0.
+- Report error: null.
+
+Evidence SHA-256:
+
+```text
+7332e8c697fdb44f3c9c0f3cee1fdf6361dc69e4c6263a1fcdade6ffe87d7083
+```
+
+### Question and evidence
+
+> What does it mean for the will to give itself a universal law?
+
+Supplied passage ID:
+
+- passage:kant:groundwork:2:autonomy:en
+
+### Observed answer
+
+Status: answered. Limitations: empty.
+
+Claim:
+
+> For the will to give itself a universal law means that it is a law to itself independently of any property of the objects of volition, operating on the principle to always choose in such a way that the same volition comprehends the maxims of the choice as a universal law.
+
+Referenced passage ID:
+
+- passage:kant:groundwork:2:autonomy:en
+
+### Assessment
+
+Meets the current draft criteria.
+
+The answer preserves both independence from properties of the objects
+of volition and the connection between choice, maxims, and universal law.
+
+It does not equate autonomy with arbitrary preference or supply
+an unsupported broader derivation.
+
+The wording closely follows the source rather than offering an accessible
+explanation. The current case does not require examples or a separate
+clarification of terminology; no new requirement is imposed retrospectively.
+
+The source review status remains candidate.
+
+## Run: answer-paraphrase-p2
+
+### Identity
+
+- Attempt: initial.
+- UTC start: 2026-11-05T13:24:04.966754+00:00.
+- UTC finish: 2026-11-05T13:24:06.486624+00:00.
+- Generator-call duration: approximately 1.52 seconds.
+- CLI exit code: 0.
+- Report error: null.
+
+Evidence SHA-256:
+
+```text
+16304f1b73ccf819cf0e36113a3825c80caf58ec5c96d65f69613254bf46a1f8
+```
+
+### Question and evidence
+
+> Is someone's own good enough to justify forcing them to act, or must other people be at risk?
+
+Supplied passage ID:
+
+- passage:mill:on-liberty:1:harm:en
+
+### Observed answer
+
+Status: answered. Limitations: empty.
+
+Claim:
+
+> Power can only be rightfully exercised over a member of a civilized community against their will to prevent harm to others, meaning someone's own good is not sufficient justification.
+
+Referenced passage ID:
+
+- passage:mill:on-liberty:1:harm:en
+
+### Assessment
+
+Does not meet the current draft criteria because a required limitation
+is missing.
+
+The answer preserves the main distinction and the quoted scope.
+It does not explicitly claim that any risk justifies any coercive measure.
+
+However, it does not explain that identifying the permissible purpose
+does not establish the sufficiency of any particular risk or proposed
+coercive measure. The case explicitly requires that limitation.
+
+This is an omission, not an observed assertion that every coercive
+measure is justified.
+
+An empty limitations array is not by itself decisive: equivalent wording
+elsewhere in the answer could satisfy the semantic requirement.
+Here, the required clarification is absent throughout the answer.
+
+The source review status remains candidate.
+
+## Run: answer-q6
+
+### Identity
+
+- Attempt: initial.
+- UTC start: 2026-11-05T13:25:50.320847+00:00.
+- UTC finish: 2026-11-05T13:25:59.011050+00:00.
+- Generator-call duration: approximately 8.69 seconds.
+- CLI exit code: 0.
+- Report error: null.
+
+Evidence SHA-256:
+
+```text
+15c71d5239e50d66378ed198dbaa5c5cd6ae6963ae57c54b8fe145f8eb843462
+```
+
+### Question and evidence
+
+> Почему бесконечное нельзя постичь через сравнение и пропорцию?
+
+Supplied passage ID:
+
+- passage:cusanus:ddi:1.1:la
+
+### Observed answer
+
+Status: answered. Limitations: empty.
+
+Claim:
+
+> Бесконечное ускользает от любой пропорции, в то время как любая познавательная деятельность легка в сравнительной пропорциональной связи и трудна при достижении бесконечного, поэтому бесконечное непостижимо.
+
+Referenced passage ID:
+
+- passage:cusanus:ddi:1.1:la
+
+### Assessment
+
+Meets the current draft criteria with a wording caveat.
+
+The answer preserves ease within comparative proportional relations,
+difficulty when reaching the infinite, and the stated inference from
+escaping every proportion to incomprehensibility.
+
+It adds no mathematical proof or broader theory of finite intellect.
+It does not claim that all meaningful statements about the infinite
+are impossible or present the Russian text as a published translation.
+
+Любая познавательная деятельность is broader and less precise than
+исследование for inquisitio. In this sentence, the conditions and
+argumentative connection remain present. Record the wording caveat
+without treating a required semantic point as lost.
+
+The final statement of incomprehensibility remains connected to
+the preceding proportional-comparison explanation.
+
+## Run: answer-negative-n1, initial attempt
+
+### Identity
+
+- Attempt: initial.
+- UTC start: 2026-11-05T13:27:50.560560+00:00.
+- UTC finish: 2026-11-05T13:27:52.082892+00:00.
+- Generator-call duration: approximately 1.53 seconds.
+- CLI exit code: 1.
+- Outcome: HTTP 503; no answer.
+
+Evidence SHA-256:
+
+```text
+5362bb749dd4a98849a54d5ac8fc46aace407a2dd6e53435a1e772f7144bd0b1
+```
+
+### Question and evidence
+
+> How does Kant distinguish a hypothetical imperative from a categorical imperative?
+
+Supplied passage IDs:
+
+- passage:kant:groundwork:2:humanity:en
+- passage:kant:groundwork:2:autonomy:en
+
+### Assessment
+
+Not assessable. This is an execution failure, not a semantic failure
+or a successful insufficient_evidence answer.
+
+The intended test of refusing an unsupported comparison could not
 be assessed.
 
-The q1/paraphrase-p1 contrast remains incomplete.
-Do not infer a difference in semantic performance from the HTTP failure.
+## Run: answer-negative-n1, separate manual retry
+
+### Identity
+
+- Attempt: separate manual retry after HTTP 503.
+- UTC start: 2026-11-05T13:29:41.608452+00:00.
+- UTC finish: 2026-11-05T13:29:47.845298+00:00.
+- Generator-call duration: approximately 6.24 seconds.
+- CLI exit code: 1.
+- Outcome: HTTP 503; no answer.
+
+Evidence SHA-256:
+
+```text
+5362bb749dd4a98849a54d5ac8fc46aace407a2dd6e53435a1e772f7144bd0b1
+```
+
+### Question and evidence
+
+> How does Kant distinguish a hypothetical imperative from a categorical imperative?
+
+Supplied passage IDs:
+
+- passage:kant:groundwork:2:humanity:en
+- passage:kant:groundwork:2:autonomy:en
+
+### Assessment
+
+Not assessable. A second execution failure does not establish that
+the question or its content caused the server error.
+
+No further immediate request was made as part of this recorded sequence.
+Semantic evaluation of this case remains incomplete.
+
+## Findings and limitations
+
+All seven returned answers passed automatic checks, but AI-assisted
+review identified two semantic nonconformities:
+
+- q5 substitutes derived from for abstracts from.
+- paraphrase-p2 omits an explicitly required limitation.
+
+Two other answers have recorded wording caveats:
+
+- paraphrase-p1 uses воспринимать where conduct-oriented wording
+  would be more precise.
+- q6 uses любая познавательная деятельность rather than исследование.
+
+The available q1 and paraphrase-p1 answers show the intended distinction
+between a justification question and a question asking how to act.
+
+Execution availability and semantic quality remain separate dimensions.
+The four HTTP 503 attempts do not count as semantic failures or passes.
+
+These selected observations are not a benchmark score, an estimate
+of provider-wide availability, or project-author semantic approval.
 
 ## Follow-up boundaries
 
@@ -387,6 +658,9 @@ Do not retry a failed semantic case solely to replace the observed
 result with a successful sample.
 
 Do not weaken the rubric to accommodate the observed wording.
+
+Network attempts were paused after the second negative-n1 HTTP 503.
+Do not describe the eight-case semantic evaluation as complete.
 
 No prompt, adapter, Production setting, corpus review status,
 or rubric approval status is changed by this review log.

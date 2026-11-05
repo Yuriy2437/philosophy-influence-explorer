@@ -275,30 +275,39 @@ not Production authentication or authorization.
 
 ## Observed live runs
 
-Five live attempts cover four distinct cases. Execution outcomes
+Eleven live attempts cover all eight distinct cases. Execution outcomes
 and AI-assisted semantic assessments are recorded in
 [the run review log](answer-quality-evaluation-runs.md).
 
-Three attempts returned answers that passed automatic checks:
-answer-negative-n3 and the separate manual retry of answer-q1 met
-the draft semantic criteria; answer-q5 did not, because its wording
-replaced abstracts from with derived from.
+Seven attempts returned answers, all of which passed automatic checks.
+AI-assisted review assessed:
 
-The initial answer-q1 attempt and the initial answer-paraphrase-p1
-attempt ended with HTTP 503. They produced no assessable answer,
-and automatic checks were not performed.
+- Three answers as meeting the draft criteria without a noted wording caveat.
+- Two answers as meeting them with wording caveats.
+- Two answers as not meeting them: answer-q5 substituted derived from
+  for abstracts from, and answer-paraphrase-p2 omitted a required limitation.
 
-The q1/paraphrase-p1 contrast remains incomplete.
-These observations are not a complete suite evaluation, a statistical
-estimate of reliability, or project-author semantic approval.
+Four attempts ended with HTTP 503 and produced no assessable answer:
+the initial q1 attempt, the initial paraphrase-p1 attempt, and both
+negative-n1 attempts. Automatic checks were not performed for them.
 
-Original JSON reports remain unchanged, with manual_review fields null.
+Separate manual retries returned assessable answers for q1 and
+paraphrase-p1, completing one observed why-versus-how contrast.
+Negative-n1 remains without an assessable answer after two attempts.
+
+All eight cases have been attempted, but semantic evaluation is
+incomplete. Network attempts were paused after the second negative-n1
+HTTP 503.
+
+These observations are not a statistical estimate of reliability
+or project-author semantic approval. Original JSON reports remain
+unchanged, with manual_review fields null.
 
 ## Not implemented in this increment
 
 - A workflow for entering and validating completed manual reviews.
 - Atomic report-file publication.
-- A complete live-provider run of all eight cases.
+- An assessable live-provider answer and semantic review for negative-n1.
 - Project-author semantic approval of the observed answers.
 - End-to-end answer-workflow evaluation.
 - Corpus snapshot comparison with Aura.
