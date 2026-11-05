@@ -20,6 +20,7 @@ It is not an independent benchmark or scholarly certification.
 - tests/test_answer_evaluation_report.py
 - src/philosophy_influence_explorer/evaluation/answer_cli.py
 - tests/test_answer_evaluation_cli.py
+- docs/answer-quality-evaluation-runs.md
 
 Existing semantic-search datasets and historical judgments are unchanged.
 
@@ -272,11 +273,26 @@ Tests substitute HTTP responses and do not call the live provider.
 The --allow-network flag is an explicit local execution gate,
 not Production authentication or authorization.
 
+## Observed live runs
+
+Two selected live cases have been executed and reviewed with AI
+assistance against the draft rubric. See
+[the run review log](answer-quality-evaluation-runs.md).
+
+Both passed automatic checks. The irrelevant-evidence case
+answer-negative-n3 met the draft semantic criteria; answer-q5 did not,
+because its wording replaced abstracts from with derived from.
+
+These observations are not a complete suite evaluation or
+project-author approval. Original JSON reports remain unchanged,
+with manual_review fields null.
+
 ## Not implemented in this increment
 
 - A workflow for entering and validating completed manual reviews.
 - Atomic report-file publication.
-- A completed live-provider evaluation run and manual review of its answers.
+- A complete live-provider run of all eight cases.
+- Project-author semantic approval of the observed answers.
 - End-to-end answer-workflow evaluation.
 - Corpus snapshot comparison with Aura.
 - Model-based judging.
