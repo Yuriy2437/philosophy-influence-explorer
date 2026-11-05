@@ -275,17 +275,24 @@ not Production authentication or authorization.
 
 ## Observed live runs
 
-Two selected live cases have been executed and reviewed with AI
-assistance against the draft rubric. See
+Five live attempts cover four distinct cases. Execution outcomes
+and AI-assisted semantic assessments are recorded in
 [the run review log](answer-quality-evaluation-runs.md).
 
-Both passed automatic checks. The irrelevant-evidence case
-answer-negative-n3 met the draft semantic criteria; answer-q5 did not,
-because its wording replaced abstracts from with derived from.
+Three attempts returned answers that passed automatic checks:
+answer-negative-n3 and the separate manual retry of answer-q1 met
+the draft semantic criteria; answer-q5 did not, because its wording
+replaced abstracts from with derived from.
 
-These observations are not a complete suite evaluation or
-project-author approval. Original JSON reports remain unchanged,
-with manual_review fields null.
+The initial answer-q1 attempt and the initial answer-paraphrase-p1
+attempt ended with HTTP 503. They produced no assessable answer,
+and automatic checks were not performed.
+
+The q1/paraphrase-p1 contrast remains incomplete.
+These observations are not a complete suite evaluation, a statistical
+estimate of reliability, or project-author semantic approval.
+
+Original JSON reports remain unchanged, with manual_review fields null.
 
 ## Not implemented in this increment
 
