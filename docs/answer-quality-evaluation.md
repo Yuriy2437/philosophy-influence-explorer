@@ -275,39 +275,49 @@ not Production authentication or authorization.
 
 ## Observed live runs
 
-Eleven live attempts cover all eight distinct cases. Execution outcomes
-and AI-assisted semantic assessments are recorded in
+Thirteen CLI invocations cover all eight distinct cases. Twelve JSON
+reports were saved; one invocation stopped during local setup because
+GOOGLE_API_KEY was absent and produced no report or provider request.
+
+Execution outcomes and AI-assisted semantic assessments are recorded in
 [the run review log](answer-quality-evaluation-runs.md).
 
-Seven attempts returned answers, all of which passed automatic checks.
+Eight invocations returned answers, all of which passed automatic checks.
 AI-assisted review assessed:
 
-- Three answers as meeting the draft criteria without a noted wording caveat.
+- Four answers as meeting the draft criteria without a noted wording caveat.
 - Two answers as meeting them with wording caveats.
 - Two answers as not meeting them: answer-q5 substituted derived from
   for abstracts from, and answer-paraphrase-p2 omitted a required limitation.
 
-Four attempts ended with HTTP 503 and produced no assessable answer:
-the initial q1 attempt, the initial paraphrase-p1 attempt, and both
-negative-n1 attempts. Automatic checks were not performed for them.
+Four invocations ended with HTTP 503 and saved reports without assessable
+answers: the initial q1 invocation, the initial paraphrase-p1 invocation,
+and the first two negative-n1 invocations. Automatic checks were not
+performed for these failures.
 
 Separate manual retries returned assessable answers for q1 and
 paraphrase-p1, completing one observed why-versus-how contrast.
-Negative-n1 remains without an assessable answer after two attempts.
 
-All eight cases have been attempted, but semantic evaluation is
-incomplete. Network attempts were paused after the second negative-n1
-HTTP 503.
+After the two negative-n1 HTTP 503 failures, a further invocation stopped
+locally because the API key was absent. Once the process environment was
+configured, another separate invocation returned insufficient_evidence,
+with no claims and an explicit explanation that the supplied passages
+do not provide the requested comparison. This answer meets the current
+draft case criteria according to AI-assisted review.
 
-These observations are not a statistical estimate of reliability
-or project-author semantic approval. Original JSON reports remain
-unchanged, with manual_review fields null.
+Each of the eight cases now has one returned answer and an AI-assisted
+semantic assessment. This completes case coverage for the recorded
+fixed-evidence series, not repeated-sample testing or end-to-end
+answer-workflow evaluation.
+
+These observations are not a statistical estimate of reliability,
+independent scholarly review, or project-author semantic approval.
+Original JSON reports remain unchanged, with manual_review fields null.
 
 ## Not implemented in this increment
 
 - A workflow for entering and validating completed manual reviews.
 - Atomic report-file publication.
-- An assessable live-provider answer and semantic review for negative-n1.
 - Project-author semantic approval of the observed answers.
 - End-to-end answer-workflow evaluation.
 - Corpus snapshot comparison with Aura.

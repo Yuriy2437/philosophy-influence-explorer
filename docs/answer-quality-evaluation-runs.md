@@ -21,40 +21,49 @@ case ID, execution timestamp, and evidence hash.
 
 ## Summary
 
-| Case ID              | Attempt               | UTC start                        | Automatic checks        | AI-assisted semantic assessment                 |
-| -------------------- | --------------------- | -------------------------------- | ----------------------- | ----------------------------------------------- |
-| answer-negative-n3   | Initial               | 2026-11-04T13:29:46.662238+00:00 | Passed                  | Meets draft criteria                            |
-| answer-q5            | Initial               | 2026-11-05T09:47:13.641754+00:00 | Passed                  | Does not meet draft criteria                    |
-| answer-q1            | Initial               | 2026-11-05T12:21:07.584697+00:00 | Not performed: HTTP 503 | Not assessable                                  |
-| answer-q1            | Separate manual retry | 2026-11-05T12:23:54.853712+00:00 | Passed                  | Meets draft criteria                            |
-| answer-paraphrase-p1 | Initial               | 2026-11-05T12:26:59.818864+00:00 | Not performed: HTTP 503 | Not assessable                                  |
-| answer-paraphrase-p1 | Separate manual retry | 2026-11-05T12:51:04.336366+00:00 | Passed                  | Meets core draft criteria with a wording caveat |
-| answer-q2            | Initial               | 2026-11-05T13:19:40.434260+00:00 | Passed                  | Meets draft criteria                            |
-| answer-paraphrase-p2 | Initial               | 2026-11-05T13:24:04.966754+00:00 | Passed                  | Does not meet draft criteria                    |
-| answer-q6            | Initial               | 2026-11-05T13:25:50.320847+00:00 | Passed                  | Meets draft criteria with a wording caveat      |
-| answer-negative-n1   | Initial               | 2026-11-05T13:27:50.560560+00:00 | Not performed: HTTP 503 | Not assessable                                  |
-| answer-negative-n1   | Separate manual retry | 2026-11-05T13:29:41.608452+00:00 | Not performed: HTTP 503 | Not assessable                                  |
+| Case ID              | Attempt                                               | UTC start                           | Automatic checks               | AI-assisted semantic assessment                 |
+| -------------------- | ----------------------------------------------------- | ----------------------------------- | ------------------------------ | ----------------------------------------------- |
+| answer-negative-n3   | Initial                                               | 2026-11-04T13:29:46.662238+00:00    | Passed                         | Meets draft criteria                            |
+| answer-q5            | Initial                                               | 2026-11-05T09:47:13.641754+00:00    | Passed                         | Does not meet draft criteria                    |
+| answer-q1            | Initial                                               | 2026-11-05T12:21:07.584697+00:00    | Not performed: HTTP 503        | Not assessable                                  |
+| answer-q1            | Separate manual retry                                 | 2026-11-05T12:23:54.853712+00:00    | Passed                         | Meets draft criteria                            |
+| answer-paraphrase-p1 | Initial                                               | 2026-11-05T12:26:59.818864+00:00    | Not performed: HTTP 503        | Not assessable                                  |
+| answer-paraphrase-p1 | Separate manual retry                                 | 2026-11-05T12:51:04.336366+00:00    | Passed                         | Meets core draft criteria with a wording caveat |
+| answer-q2            | Initial                                               | 2026-11-05T13:19:40.434260+00:00    | Passed                         | Meets draft criteria                            |
+| answer-paraphrase-p2 | Initial                                               | 2026-11-05T13:24:04.966754+00:00    | Passed                         | Does not meet draft criteria                    |
+| answer-q6            | Initial                                               | 2026-11-05T13:25:50.320847+00:00    | Passed                         | Meets draft criteria with a wording caveat      |
+| answer-negative-n1   | Initial                                               | 2026-11-05T13:27:50.560560+00:00    | Not performed: HTTP 503        | Not assessable                                  |
+| answer-negative-n1   | Separate manual retry                                 | 2026-11-05T13:29:41.608452+00:00    | Not performed: HTTP 503        | Not assessable                                  |
+| answer-negative-n1   | Separate manual retry; local setup failure            | Not recorded; local date 2026-11-09 | Not performed: missing API key | Not assessable; no report                       |
+| answer-negative-n1   | Separate manual retry after environment configuration | 2026-11-09T07:07:27.768701+00:00    | Passed                         | Meets draft criteria                            |
 
-Eleven attempts cover all eight distinct cases.
+Thirteen CLI invocations cover all eight distinct cases.
+Twelve JSON reports were saved. One invocation stopped during local
+setup because GOOGLE_API_KEY was absent, before any provider request
+or report generation.
 
-Seven attempts returned answers, all of which passed automatic checks.
-AI-assisted review assessed three answers as meeting the draft criteria
+Eight invocations returned answers, all of which passed automatic checks.
+AI-assisted review assessed four answers as meeting the draft criteria
 without a noted wording caveat, two as meeting them with wording caveats,
 and two as not meeting them.
 
-Four attempts ended with HTTP 503 and produced no answer.
-They are execution failures, not semantic failures.
+Four invocations ended with HTTP 503 and saved reports without answers.
+These are execution failures, not semantic failures.
+The missing-key invocation is a separate local setup failure.
 
-Seven distinct cases have assessable answers. The remaining case,
-answer-negative-n1, has no assessable answer after two attempts.
+Each of the eight distinct cases now has one returned answer and
+an AI-assisted semantic assessment.
 
 The q1/paraphrase-p1 contrast has been observed in returned answers:
 q1 returned partial with a missing-justification limitation, while
 paraphrase-p1 returned answered with a Russian restatement of the principle.
 
-This is not a complete semantic evaluation of all eight cases,
-a statistical estimate of reliability, or evidence of stable behavior
-across repeated samples.
+The successful negative-n1 invocation returned insufficient_evidence
+with no claims and an explicit explanation of the missing comparison.
+
+This completes case coverage for the recorded fixed-evidence series.
+It is not repeated-sample testing, end-to-end answer-workflow evaluation,
+a statistical estimate of reliability, or evidence of stable behavior.
 
 ## Shared execution context
 
@@ -74,11 +83,19 @@ Retries of q1, paraphrase-p1, and negative-n1 were separate manual
 invocations after execution errors. They were not automatic retries
 within the preceding attempts.
 
-System instruction SHA-256 for every attempt:
+System instruction SHA-256 recorded in every saved report:
 
 ```text
 da9f8bf938a147e993c38a66ff4e829adcc44effa5c0dd1452c901cbba87b4d2
 ```
+
+The missing-key invocation produced no execution metadata or evidence
+hash. The shared settings above describe the saved evaluation reports
+and requested CLI parameters, not a completed execution for that invocation.
+
+Inspection of the CLI and generator confirmed that an empty API key
+raises ValueError in the generator constructor, before evaluation,
+HTTP transmission, and report generation.
 
 For every recorded HTTP 503:
 
@@ -621,12 +638,126 @@ Supplied passage IDs:
 Not assessable. A second execution failure does not establish that
 the question or its content caused the server error.
 
-No further immediate request was made as part of this recorded sequence.
-Semantic evaluation of this case remains incomplete.
+Network attempts were paused after this failure. Later separate
+invocations on 2026-11-09 are recorded below; this failed report
+remains unchanged.
+
+## Invocation: answer-negative-n1, local setup failure
+
+### Identity
+
+- Attempt: separate manual retry; filename label retry2.
+- Local date: 2026-11-09.
+- Exact UTC start and finish: not recorded.
+- CLI exit code: 2.
+- JSON report: not created.
+- Provider request: not made.
+
+The intended output path was:
+
+```text
+exports/answer-negative-n1-retry2-20261109-094745-d88707ff.json
+```
+
+The timestamp in this filename was generated when constructing the path.
+It is not a recorded evaluation start timestamp.
+
+### Observed outcome
+
+The CLI printed:
+
+> Evaluation setup or report saving failed. Check case ID, model, GOOGLE_API_KEY, limits, and output path. A saving failure may occur after the provider call.
+
+A subsequent environment check showed:
+
+- GOOGLE_API_KEY was absent or blank in the current process.
+- The exports directory existed.
+- The intended report file did not exist.
+
+Source inspection confirmed that the CLI passes the process environment
+value directly to GeminiAnswerGenerator. Its constructor rejects an empty
+key with ValueError before run_answer_evaluation and before any HTTP call.
+
+### Assessment
+
+Not assessable. This was a local configuration failure, not an HTTP 503,
+a provider response, or a semantic failure.
+
+No answer, automatic-check results, evidence hash, or execution metadata
+were produced. Do not assign this invocation the evidence hash from
+another attempt.
+
+The API key was subsequently supplied to the process environment.
+No source-code change was required.
+
+## Run: answer-negative-n1, successful separate manual retry
+
+### Identity
+
+- Attempt: separate manual retry after environment configuration;
+  filename label retry3.
+- UTC start: 2026-11-09T07:07:27.768701+00:00.
+- UTC finish: 2026-11-09T07:07:29.174467+00:00.
+- Generator-call duration: approximately 1.41 seconds.
+- CLI exit code: 0.
+- Report error: null.
+- All automatic checks: passed.
+
+Evidence SHA-256:
+
+```text
+5362bb749dd4a98849a54d5ac8fc46aace407a2dd6e53435a1e772f7144bd0b1
+```
+
+This matches the evidence hash in both earlier negative-n1 reports.
+The requested model and recorded system instruction hash also match
+the earlier reports. The serving-model version was not captured.
+
+### Question and evidence
+
+> How does Kant distinguish a hypothetical imperative from a categorical imperative?
+
+Supplied passage IDs:
+
+- passage:kant:groundwork:2:humanity:en
+- passage:kant:groundwork:2:autonomy:en
+
+### Observed answer
+
+Status: insufficient_evidence.
+
+Claims: empty.
+
+Limitation:
+
+> The supplied passages discuss the practical imperative regarding humanity as an end and the autonomy of the will, but they do not contain any information distinguishing a hypothetical imperative from a categorical imperative.
+
+The draft_answer and answer fields contain the same structured response.
+
+### Assessment
+
+Meets the current draft case criteria.
+
+The answer uses the only allowed status, makes no claims, and identifies
+the specific evidence gap: the supplied excerpts discuss humanity as
+an end and autonomy but do not provide the requested distinction.
+
+It does not introduce the missing comparison from background knowledge
+or treat thematic relevance as sufficient support.
+
+The limitation concerns the supplied passages, not the whole work
+or Kant's philosophy generally.
+
+With no claims, reference validity means that no out-of-packet references
+occur. It does not demonstrate support for substantive cited claims.
+
+This is an AI-assisted assessment. Project-author semantic approval
+has not been recorded. The original report remains unchanged,
+with manual_review fields null.
 
 ## Findings and limitations
 
-All seven returned answers passed automatic checks, but AI-assisted
+All eight returned answers passed automatic checks, but AI-assisted
 review identified two semantic nonconformities:
 
 - q5 substitutes derived from for abstracts from.
@@ -644,6 +775,13 @@ between a justification question and a question asking how to act.
 Execution availability and semantic quality remain separate dimensions.
 The four HTTP 503 attempts do not count as semantic failures or passes.
 
+The local missing-key invocation also counts as neither a semantic
+failure nor a pass. It made no provider request and produced no report.
+
+Negative-n1 now has an assessable answer meeting the draft criteria.
+All eight cases have one returned answer and an AI-assisted assessment;
+this does not establish repeatability or project-author approval.
+
 These selected observations are not a benchmark score, an estimate
 of provider-wide availability, or project-author semantic approval.
 
@@ -659,8 +797,15 @@ result with a successful sample.
 
 Do not weaken the rubric to accommodate the observed wording.
 
-Network attempts were paused after the second negative-n1 HTTP 503.
-Do not describe the eight-case semantic evaluation as complete.
+Network attempts were paused after the second negative-n1 HTTP 503
+and resumed separately on 2026-11-09.
+
+The recorded series now has a returned answer and AI-assisted assessment
+for every case. No further network calls are needed to complete this
+case-coverage step.
+
+Do not describe this coverage as project-author semantic approval,
+repeated-sample validation, or end-to-end workflow evaluation.
 
 No prompt, adapter, Production setting, corpus review status,
 or rubric approval status is changed by this review log.
