@@ -19,11 +19,15 @@ from philosophy_influence_explorer.evaluation.answer_runner import (
     run_answer_evaluation,
 )
 from philosophy_influence_explorer.generation.gemini import (
-    SYSTEM_INSTRUCTION,
     GeminiAnswerGenerator,
 )
 from philosophy_influence_explorer.ingestion.validators import (
     validate_curated_corpus,
+)
+from philosophy_influence_explorer.evaluation.answer_instructions import (
+    BASELINE_INSTRUCTION_ID,
+    INSTRUCTION_IDS,
+    resolve_system_instruction,
 )
 
 
@@ -36,6 +40,7 @@ def run_gemini_case(
     allow_network: bool,
     timeout_seconds: float = 60.0,
     max_input_bytes: int = 64_000,
+    instruction_id: str = BASELINE_INSTRUCTION_ID,
 ) -> dict:
     """Run one explicitly selected case and save its diagnostic report.
 
@@ -47,6 +52,8 @@ def run_gemini_case(
     """
     if not allow_network:
         raise ValueError("Explicit --allow-network approval is required.")
+
+    system_instruction = resolve_system_instruction(instruction_id)
 
     if destination.exists() or destination.is_symlink():
         raise FileExistsError("Report destination already exists.")
@@ -76,6 +83,7 @@ def run_gemini_case(
         model=model,
         timeout_seconds=timeout_seconds,
         max_input_bytes=max_input_bytes,
+        system_instruction=system_instruction,
     )
 
     started = datetime.now(UTC).isoformat()
@@ -92,7 +100,10 @@ def run_gemini_case(
         "max_input_bytes": max_input_bytes,
         "runner_retries": 0,
         "adapter_retries": 0,
-        "system_instruction_sha256": hashlib.sha256(SYSTEM_INSTRUCTION.encode("utf-8")).hexdigest(),
+        "system_instruction_id": instruction_id,
+        "system_instruction_sha256": hashlib.sha256(
+            system_instruction.encode("utf-8")
+        ).hexdigest(),
         "answer_validation_location": "adapter_and_runner",
         "rejected_provider_output_retained": False,
     }
@@ -102,7 +113,8 @@ def run_gemini_case(
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Run one fixed-evidence case with Gemini.")
+    parser = argparse.ArgumentParser(
+        description="Run one fixed-evidence case with Gemini.")
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--case-id", required=True)
     parser.add_argument("--model", required=True)
@@ -110,6 +122,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--allow-network", action="store_true")
     parser.add_argument("--timeout-seconds", type=float, default=60.0)
     parser.add_argument("--max-input-bytes", type=int, default=64_000)
+    parser.add_argument(
+        "--instruction-id",
+        choices=INSTRUCTION_IDS,
+        default=BASELINE_INSTRUCTION_ID,
+        help="Evaluation instruction variant; default: baseline.",
+    )
     args = parser.parse_args(argv)
 
     try:
@@ -121,6 +139,7 @@ def main(argv: list[str] | None = None) -> int:
             allow_network=args.allow_network,
             timeout_seconds=args.timeout_seconds,
             max_input_bytes=args.max_input_bytes,
+            instruction_id=args.instruction_id,
         )
     except (ValueError, OSError):
         # Avoid printing configuration values, file contents, or secrets.

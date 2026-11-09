@@ -493,3 +493,59 @@ def test_default_input_budget_rejects_oversized_evidence_before_http(
     assert "test-key" not in str(caught.value)
     assert record.review_status == "candidate"
     assert getattr(record, oversized_field) == oversized_value
+
+
+@pytest.mark.parametrize(
+    "instruction",
+    [
+        None,
+        "  Custom instruction with preserved whitespace.\n",
+    ],
+)
+def test_exact_system_instruction_is_sent(monkeypatch, instruction) -> None:
+    from philosophy_influence_explorer.generation.gemini import SYSTEM_INSTRUCTION
+
+    captured = {}
+
+    def fake_post(url, *, headers, json, timeout):
+        captured["instruction"] = json["systemInstruction"]["parts"][0]["text"]
+        return response(envelope(insufficient_answer()))
+
+    monkeypatch.setattr(httpx, "post", fake_post)
+
+    kwargs = {}
+    if instruction is not None:
+        kwargs["system_instruction"] = instruction
+
+    instance = GeminiAnswerGenerator(
+        api_key="test-key",
+        model="test-model",
+        **kwargs,
+    )
+    instance.generate(
+        query_text="Question",
+        evidence=EvidencePacket((), (), ()),
+    )
+
+    expected = SYSTEM_INSTRUCTION if instruction is None else instruction
+    assert captured["instruction"] == expected
+
+
+@pytest.mark.parametrize("instruction", ["", " \n\t", None, 123])
+def test_invalid_system_instruction_is_rejected_before_http(
+    monkeypatch,
+    instruction,
+) -> None:
+    from unittest.mock import Mock
+
+    post = Mock(side_effect=AssertionError("Unexpected HTTP request."))
+    monkeypatch.setattr(httpx, "post", post)
+
+    with pytest.raises(ValueError, match="system_instruction"):
+        GeminiAnswerGenerator(
+            api_key="test-key",
+            model="test-model",
+            system_instruction=instruction,
+        )
+
+    post.assert_not_called()

@@ -56,6 +56,7 @@ class GeminiAnswerGenerator:
         model: str,
         timeout_seconds: float = 60.0,
         max_input_bytes: int = 64_000,
+        system_instruction: str = SYSTEM_INSTRUCTION,
     ) -> None:
         if not api_key.strip():
             raise ValueError("GOOGLE_API_KEY is required for generation.")
@@ -69,10 +70,14 @@ class GeminiAnswerGenerator:
         if type(max_input_bytes) is not int or max_input_bytes < 1:
             raise ValueError("max_input_bytes must be a positive integer.")
 
+        if not isinstance(system_instruction, str) or not system_instruction.strip():
+            raise ValueError("system_instruction must be a nonblank string.")
+
         self._api_key = api_key.strip()
         self._model = model
         self._timeout_seconds = timeout_seconds
         self._max_input_bytes = max_input_bytes
+        self._system_instruction = system_instruction
 
     def generate(
         self,
@@ -109,7 +114,9 @@ class GeminiAnswerGenerator:
                 url,
                 headers={"x-goog-api-key": self._api_key},
                 json={
-                    "systemInstruction": {"parts": [{"text": SYSTEM_INSTRUCTION}]},
+                    "systemInstruction": {
+                        "parts": [{"text": self._system_instruction}]
+                    },
                     "contents": [
                         {
                             "role": "user",

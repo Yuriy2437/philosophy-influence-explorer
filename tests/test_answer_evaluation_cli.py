@@ -71,7 +71,8 @@ def test_runs_one_case_and_saves_metadata(
     assert request.kwargs["headers"] == {"x-goog-api-key": TEST_KEY}
     assert request.args[0].endswith("models/test-model:generateContent")
 
-    sent = json.loads(request.kwargs["json"]["contents"][0]["parts"][0]["text"])
+    sent = json.loads(request.kwargs["json"]
+                      ["contents"][0]["parts"][0]["text"])
     assert len(sent["passages"]) == 3
     assert sent["semantic_passage_ids"] == []
     assert sent["additional_graph_passage_ids"] == []
@@ -224,3 +225,120 @@ def test_cli_without_gate_exits_before_http(
     assert caught.value.code == 2
     assert TEST_KEY not in capsys.readouterr().err
     fake_post.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "instruction_id",
+    ["baseline", "semantic-fidelity-v1"],
+)
+def test_selected_instruction_matches_request_and_saved_metadata(
+    tmp_path: Path,
+    fake_post: Mock,
+    instruction_id: str,
+) -> None:
+    from philosophy_influence_explorer.evaluation.answer_instructions import (
+        resolve_system_instruction,
+    )
+
+    args = parameters(tmp_path)
+    report = run_gemini_case(**args, instruction_id=instruction_id)
+
+    expected = resolve_system_instruction(instruction_id)
+    sent = fake_post.call_args.kwargs["json"]["systemInstruction"]["parts"][0]["text"]
+    saved = json.loads(args["destination"].read_text(encoding="utf-8"))
+
+    assert sent == expected
+    assert report["execution"]["system_instruction_id"] == instruction_id
+    assert report["execution"]["system_instruction_sha256"] == (
+        hashlib.sha256(sent.encode("utf-8")).hexdigest()
+    )
+    assert saved["execution"] == report["execution"]
+    fake_post.assert_called_once()
+
+
+def test_default_instruction_is_baseline(
+    tmp_path: Path,
+    fake_post: Mock,
+) -> None:
+    report = run_gemini_case(**parameters(tmp_path))
+
+    sent = fake_post.call_args.kwargs["json"]["systemInstruction"]["parts"][0]["text"]
+
+    assert sent == SYSTEM_INSTRUCTION
+    assert report["execution"]["system_instruction_id"] == "baseline"
+
+
+def test_unknown_instruction_prevents_http_and_report(
+    tmp_path: Path,
+    fake_post: Mock,
+) -> None:
+    args = parameters(tmp_path)
+
+    with pytest.raises(ValueError, match="Unknown evaluation instruction"):
+        run_gemini_case(**args, instruction_id="unknown")
+
+    fake_post.assert_not_called()
+    assert not args["destination"].exists()
+
+
+def test_cli_selects_candidate_instruction(
+    tmp_path: Path,
+    fake_post: Mock,
+) -> None:
+    from philosophy_influence_explorer.evaluation.answer_instructions import (
+        CANDIDATE_INSTRUCTION_ID,
+        resolve_system_instruction,
+    )
+
+    destination = tmp_path / "candidate-report.json"
+
+    code = main(
+        [
+            "--root",
+            str(ROOT),
+            "--case-id",
+            CASE_ID,
+            "--model",
+            "test-model",
+            "--output",
+            str(destination),
+            "--instruction-id",
+            CANDIDATE_INSTRUCTION_ID,
+            "--allow-network",
+        ]
+    )
+
+    assert code == 0
+    sent = fake_post.call_args.kwargs["json"]["systemInstruction"]["parts"][0]["text"]
+    assert sent == resolve_system_instruction(CANDIDATE_INSTRUCTION_ID)
+    saved = json.loads(destination.read_text(encoding="utf-8"))
+    assert saved["execution"]["system_instruction_id"] == CANDIDATE_INSTRUCTION_ID
+    fake_post.assert_called_once()
+
+
+def test_cli_unknown_instruction_exits_before_http(
+    tmp_path: Path,
+    fake_post: Mock,
+) -> None:
+    destination = tmp_path / "report.json"
+
+    with pytest.raises(SystemExit) as caught:
+        main(
+            [
+                "--root",
+                str(ROOT),
+                "--case-id",
+                CASE_ID,
+                "--model",
+                "test-model",
+                "--output",
+                str(destination),
+                "--instruction-id",
+                "unknown",
+                "--allow-network",
+            ]
+        )
+
+    assert caught.value.code == 2
+    fake_post.assert_not_called()
+    assert not destination.exists()
