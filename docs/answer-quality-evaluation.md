@@ -314,6 +314,36 @@ These observations are not a statistical estimate of reliability,
 independent scholarly review, or project-author semantic approval.
 Original JSON reports remain unchanged, with manual_review fields null.
 
+## Controlled instruction experiment
+
+A separate 16-invocation comparison of the baseline instruction and
+semantic-fidelity-v1 was completed on 2026-11-10.
+
+The design is documented in
+[the experiment plan](answer-quality-prompt-experiment-plan.md).
+Execution identities, returned answer text, and AI-assisted assessments
+are recorded in
+[the experiment review](answer-quality-prompt-experiment-review.md).
+
+All 16 invocations returned answers and passed automatic checks.
+Under the existing draft semantic criteria, six of eight baseline
+answers and five of eight candidate answers met the criteria,
+including answers with wording caveats.
+
+Both arms omitted the required limitation on paraphrase-p2.
+Both failed the required easy-versus-difficult contrast on q6.
+The candidate also omitted the required contrast on q5, where the
+fresh baseline met the criteria, producing one observed semantic
+regression under the plan's definition.
+
+This known-set comparison used one sample per case per arm.
+It does not establish a causal instruction effect, repeatability,
+general model quality, or project-author semantic approval.
+
+The candidate did not demonstrate an advantage in this series.
+Production defaults remain unchanged; semantic-fidelity-v1 remains
+an explicit evaluation-only option. The authorized sequence is complete.
+
 ## Not implemented in this increment
 
 - A workflow for entering and validating completed manual reviews.
