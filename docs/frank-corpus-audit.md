@@ -124,3 +124,68 @@ Do not add influence edges merely because passages discuss related concepts.
 
 None to corpus data, application code, prompts, database contents,
 or historical evaluation results.
+
+## Follow-up: primary-text candidate located
+
+Follow-up date: 2026-11-11.
+
+A candidate passage has been located in:
+
+Frank, S. L. Sochineniya. Moscow: Pravda, 1990.
+Work: Nepostizhimoe.
+Section: Introduction.
+Printed page: 196.
+Original PDF leaf: 198 (one-based).
+
+Digital source:
+https://imwerden.de/publ-15109
+
+PDF:
+https://imwerden.de/pdf/frank_sochineniya_1990__ocr.pdf
+
+The uploaded PDF and the separately supplied page confirm the locator.
+Text extraction is available but contains OCR errors. Final visual
+verification of the transcription remains pending.
+
+### Candidate research question
+
+In what sense does Frank distinguish the unknowable from what is
+inaccessible to experiential consciousness?
+
+### Proposed passage boundaries
+
+Start:
+"Если мы возьмем сначала «непостижимое» в буквальном смысле"
+
+End:
+"что остается недоступным нашей постигающей мысли."
+
+The full passage is not reproduced in this audit.
+
+### Draft assessment criteria
+
+A supported answer should:
+
+- distinguish accessibility to experiential consciousness from
+  accessibility to comprehending cognition;
+- preserve the author's qualification that the assumption is, at this
+  stage, hypothetical in its real significance;
+- avoid presenting this introductory distinction as the completed
+  argument of the book;
+- avoid inferring historical influence from this passage.
+
+These are draft criteria, not author-approved evaluation requirements.
+
+### Release decision
+
+The candidate has not been added to curated CSV data, Neo4j,
+public API evidence, or live provider evaluation.
+
+Retain `rights_to_verify`.
+
+The quotation exception, public dataset redistribution, public API use,
+and external-provider processing must not be treated as interchangeable
+permissions.
+
+No claim of worldwide public-domain status or a reusable source licence
+has been established.
