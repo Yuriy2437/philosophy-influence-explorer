@@ -1,328 +1,288 @@
 # Philosophy Influence Explorer
 
-> A multilingual, source-grounded GraphRAG application for exploring philosophical concepts, texts, and intellectual influence across Russian, English, and German.
+An early-stage, multilingual, source-grounded research application for
+exploring philosophical passages and conceptual connections.
 
-**Philosophy Influence Explorer** is an AI research application that makes complex philosophical corpora easier to explore without concealing the evidence behind generated answers. It combines a knowledge graph, hybrid retrieval, and LLM-assisted generation to answer questions with traceable source passages and visualizable conceptual paths.
+The application combines FastAPI, Neo4j, vector retrieval, explicit
+LangGraph workflows, a browser search interface, and operator-only
+structured answer generation.
 
-The initial corpus will focus on the intellectual trajectory from **Nicholas of Cusa** to later philosophical traditions, beginning with Cusanus, Hegel, and Semyon Frank. Later releases may incorporate Schelling, Husserl, and Heidegger.
+The current implementation supports passage search and conceptual graph
+context. It does not yet establish an evidence-backed historical influence
+chain from Nicholas of Cusa through Hegel to Semyon Frank.
 
-## Why this project exists
+## Current capabilities
 
-Most RAG demonstrations are generic “chat with PDF” applications. This project is intended to demonstrate production-oriented AI engineering on a difficult multilingual humanities domain:
+- Curated CSV ingestion for philosophers, works, passages, concepts,
+  sources, and relationships.
+- Vector passage retrieval with metadata filters.
+- Conceptual graph expansion around retrieved passages.
+- Evidence packet preparation with source provenance.
+- Explicit LangGraph retrieval and answer workflows.
+- Structured answer generation through a Gemini adapter.
+- Structural validation of generated answers and their evidence references.
+- Operator-only access to answer generation.
+- A browser interface for passage search, provenance, and textual graph paths.
+- Unit, API, and Chromium browser tests.
+- Historical retrieval checks and fixed-evidence generation evaluation.
 
-- Documents exist in Russian, English, German, Latin, and parallel translations.
-- Historical influence must be distinguished from conceptual affinity or interpretive hypothesis.
-- Each answer must be grounded in passages from the curated corpus.
-- Relations in the graph must retain provenance, review status, and evidence.
-- The application should be usable both by non-specialists and by researchers.
+## Architecture
 
-## Core capabilities
+The application uses the Python package layout under
+`src/philosophy_influence_explorer`.
 
-- Ask questions in Russian, English, or German.
-- Search a curated multilingual philosophical corpus.
-- Retrieve evidence with vector, full-text, and graph-based retrieval.
-- Explain conceptual links through a knowledge graph.
-- Display source passages and citations supporting each answer.
-- Distinguish direct influence, quotation, critique, conceptual affinity, and unverified hypotheses.
-- Refuse or qualify claims that lack evidence in the available corpus.
+- FastAPI provides the API and serves the browser search interface.
+- Neo4j stores the curated graph and supports retrieval.
+- Embedding configuration is separate from answer-generation configuration.
+- LangGraph orchestrates the existing retrieval and generation services.
+- Gemini provides structured answer generation through the current adapter.
+- `app.py` exposes the FastAPI application as a Vercel entry point.
 
-## Planned architecture
+The browser interface is served by FastAPI. A separate Next.js frontend
+is not part of the current implementation.
+
+### Retrieval workflow
 
 ```text
-Web client (Next.js)
-        |
-        v
-FastAPI backend
-        |
-        v
-LangGraph workflow
-  ├── detect and normalize language
-  ├── classify the question
-  ├── hybrid retrieval
-  ├── graph-path retrieval
-  ├── evidence grading
-  ├── answer generation
-  └── citation and grounding verification
-        |
-        +-----------------------+
-        |                       |
-        v                       v
-Neo4j graph + vector index   LLM provider
+validate request
+  -> retrieve passages and graph context
+  -> prepare evidence
 ```
 
-## Technology stack
+### Answer workflow
 
-| Area                  | Initial choice               | Purpose                                                           |
-| --------------------- | ---------------------------- | ----------------------------------------------------------------- |
-| Backend               | Python 3.12, FastAPI         | Typed HTTP API and application services                           |
-| Dependency management | uv                           | Fast, reproducible Python environments and lockfiles              |
-| Graph database        | Neo4j                        | Concepts, thinkers, works, passages, and evidence-aware relations |
-| RAG orchestration     | LangChain and LangGraph      | Retrieval components and explicit stateful workflow               |
-| AI models             | Provider-agnostic            | LLM generation, extraction, grading, and multilingual processing  |
-| Frontend              | Next.js / React              | Trilingual exploration interface and graph visualization          |
-| Quality               | pytest, Ruff, GitHub Actions | Tests, linting, and continuous integration                        |
-| Deployment            | Docker Compose               | Reproducible local development and future deployment              |
+```text
+retrieve evidence
+  -> generate structured draft
+  -> validate answer structure and evidence references
+```
 
-## Current status
+These workflows are currently linear. They do not include a separate
+evidence-grading stage, query rewriting, or a retrieval retry loop.
 
-The project is in the **Neo4j integration stage**. The FastAPI server currently provides:
+Reference validation checks that answer references belong to the supplied
+evidence. It does not independently establish that every claim is
+semantically supported by its cited passage.
 
-- `GET /` — service metadata and links.
-- `GET /api/v1/health` — application health check.
-- `GET /api/v1/health/database` — Neo4j connectivity health check.
-- `GET /api/v1/health/database/summary` — current graph node and relationship totals.
-- `GET /docs` — automatically generated interactive OpenAPI documentation.
+## API and browser interface
 
-The repository now includes a version-controlled Neo4j schema, a local Docker Compose environment, a Python Neo4j client, and a small curated seed graph. Hybrid retrieval, LangGraph orchestration, evaluation, and the frontend will be introduced incrementally.
+With the default API prefix:
 
-## Quick start
+| Route                             | Purpose                            |
+| --------------------------------- | ---------------------------------- |
+| `/`                               | Service metadata                   |
+| `/docs`                           | Interactive API documentation      |
+| `/redoc`                          | Alternative API documentation      |
+| `/openapi.json`                   | OpenAPI schema                     |
+| `/search`                         | Browser passage-search interface   |
+| `POST /api/v1/query`              | Retrieval-only query               |
+| `POST /api/v1/answers`            | Operator-only answer generation    |
+| `/api/v1/health`                  | Application health                 |
+| `/api/v1/health/database`         | Neo4j connectivity health          |
+| `/api/v1/health/database/summary` | Graph node and relationship totals |
+
+The API prefix is configurable through `API_V1_PREFIX`.
+The current browser code uses `/api/v1/query` directly; changing the prefix
+also requires coordinating the browser configuration.
+
+Answer generation requires:
+
+- `GENERATION_ENABLED=true`;
+- a nonempty `GENERATION_ACCESS_TOKEN`;
+- the matching bearer token on the request;
+- the required provider configuration.
+
+Generation is disabled by default.
+
+Do not embed the shared operator token in publicly served JavaScript.
+The current browser search interface does not provide public answer
+generation.
+
+## Local setup
 
 ### Prerequisites
 
-- Git
-- Python 3.12
-- [uv](https://docs.astral.sh/uv/)
-- Docker Desktop with Docker Compose
+- Git.
+- uv for Python version and dependency management.
+- Docker Desktop with Docker Compose for local Neo4j.
 
-### 1. Clone and enter the repository
+The commands below use PowerShell.
 
-```bash
-git clone [https://github.com/Yuriy2437/philosophy-influence-explorer.git](https://github.com/Yuriy2437/philosophy-influence-explorer.git)
-cd philosophy-influence-explorer
-```
-
-### 2. Create local environment settings
-
-**PowerShell (Windows):**
+### Install Python dependencies
 
 ```powershell
-Copy-Item .env.example .env
+uv python install 3.12
+uv sync --locked --all-groups --python 3.12
 ```
 
-**macOS / Linux:**
+### Start the API without Neo4j
 
-```bash
-cp .env.example .env
+This mode is useful for inspecting the application and its API schema.
+It is not a complete retrieval setup.
+
+```powershell
+$env:NEO4J_ENABLED = "false"
+
+uv run --no-sync uvicorn philosophy_influence_explorer.main:app --reload
 ```
 
-Before starting Neo4j, replace the placeholder value of `NEO4J_PASSWORD` in `.env` with a strong local password. Do not commit `.env`.
+Open:
 
-### 3. Install Python dependencies
+- http://127.0.0.1:8000/docs
+- http://127.0.0.1:8000/search
 
-```bash
-uv sync --all-groups
+Retrieval requires a configured database, imported data, and the appropriate
+embedding/index setup. Serving the search page alone does not establish
+that retrieval is ready.
+
+### Start the local Neo4j service
+
+Configure local credentials in `.env`:
+
+```dotenv
+NEO4J_ENABLED=true
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USERNAME=neo4j
+NEO4J_PASSWORD=replace-with-a-local-password
+NEO4J_DATABASE=neo4j
 ```
 
-### 4. Start Neo4j and apply the schema
+Do not commit `.env`.
 
-Start the local graph database:
+Start Neo4j:
 
-```bash
+```powershell
 docker compose up -d neo4j
-docker compose ps
 ```
 
-Apply the version-controlled graph schema once per fresh database. In PowerShell, first load local environment values into the current terminal process:
+If `NEO4J_ENABLED` was set to `false` in this PowerShell session,
+remove that process-level override before starting the application:
 
 ```powershell
-Get-Content .env | ForEach-Object {
-    if ($_ -match '^\s*([^#][^=]+)=(.*)$') {
-        $name = $matches.Trim()[1]
-        $value = $matches.Trim()[2]
-        [Environment]::SetEnvironmentVariable($name, $value, 'Process')
-    }
-}
+Remove-Item Env:NEO4J_ENABLED -ErrorAction SilentlyContinue
 ```
 
-Then execute the schema script inside the Neo4j container:
+Then start the API:
 
 ```powershell
-docker compose exec -T neo4j cypher-shell `
-  -a bolt://localhost:7687 `
-  -u $env:NEO4J_USERNAME `
-  -p $env:NEO4J_PASSWORD `
-  -d $env:NEO4J_DATABASE `
-  --file /import/init/00-schema.cypher
+uv run --no-sync uvicorn philosophy_influence_explorer.main:app --reload
 ```
 
-The schema script is idempotent: it uses `IF NOT EXISTS`, so running it again is safe.
+The Compose service exposes Neo4j Browser on port 7474 and Bolt on port 7687.
+It persists database data in Docker volumes.
 
-### 5. Seed the local demo graph
+The Compose file mounts `infra/neo4j/init` into the container. Starting the
+container should not be treated as proof that schema creation, corpus
+ingestion, embeddings, or vector-index preparation have completed.
 
-Create or update the small curated development graph:
+### Configuration boundaries
 
-```bash
-uv run python scripts/seed_demo_graph.py
+Application settings load `.env` through Pydantic Settings.
+
+The evaluated generation CLI uses process environment variables directly.
+Do not assume that placing a provider key in `.env` makes it available to
+every standalone command.
+
+The current answer endpoint explicitly uses the Gemini generator and
+`GENERATION_MODEL`. The generic `LLM_PROVIDER` setting should not be
+interpreted as a working provider switch for this endpoint.
+
+Provider defaults are configuration values, not guarantees of model
+availability, quota, or free usage. Check those constraints before making
+new live calls.
+
+## Tests and CI
+
+Run unit and API tests without Neo4j:
+
+```powershell
+$env:NEO4J_ENABLED = "false"
+uv run --no-sync python -m pytest tests -q
 ```
 
-### 6. Run the API in development mode
+Install Chromium and run browser tests:
 
-```bash
-uv run uvicorn philosophy_influence_explorer.main:app --reload
+```powershell
+uv run --no-sync python -m playwright install chromium
+uv run --no-sync python -m pytest browser_tests -q --browser chromium
 ```
 
-Open these addresses in a browser:
+Check browser-test lint and formatting:
 
-- API root: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
-- Application health check: [http://127.0.0.1:8000/api/v1/health](http://127.0.0.1:8000/api/v1/health)
-- Neo4j connectivity check: [http://127.0.0.1:8000/api/v1/health/database](http://127.0.0.1:8000/api/v1/health/database)
-- Graph summary: [http://127.0.0.1:8000/api/v1/health/database/summary](http://127.0.0.1:8000/api/v1/health/database/summary)
-- Interactive API documentation: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-
-### 7. Run quality checks
-
-```bash
-uv run ruff format --check .
-uv run ruff check .
-uv run pytest
+```powershell
+uv run --no-sync python -m ruff check browser_tests
+uv run --no-sync python -m ruff format --check browser_tests
 ```
 
-## Continuous integration
+The GitHub Actions test workflow has separate unit/API and Chromium jobs.
+It uses Python 3.12, locked dependencies, and `NEO4J_ENABLED=false`.
 
-The GitHub Actions workflow `.github/workflows/tests.yml` runs on pushes to `main`, pull requests, and manual dispatch.
+This workflow does not provision a live Neo4j database, explicitly run a
+live Gemini evaluation, or deploy the application.
 
-It contains two independent jobs:
+## Corpus and evaluation limitations
 
-- `Unit and API tests`: installs Python 3.12 and locked dependencies, then runs `tests/`.
-- `Chromium UI tests`: checks lint and formatting in `browser_tests/`, installs Chromium and its system dependencies, then runs the browser tests.
+The curated data includes Nicholas of Cusa, Hegel, Semyon Frank, Kant,
+and John Stuart Mill.
 
-Both jobs install dependencies with `uv sync --locked --all-groups --python 3.12`.
+The current relationships describe authorship, passage membership,
+concept discussion, and selected conceptual relationships. They do not
+yet encode a supported cross-author historical influence chain.
 
-The workflow sets `NEO4J_ENABLED=false` so application imports do not require local Neo4j credentials. This workflow does not provision a live Neo4j server and does not establish live-database integration coverage.
+Bibliographic notes and editorial summaries must remain distinguishable
+from verbatim primary-source passages.
 
-The first successful run of both jobs was confirmed on commit `3767446`.
+Review status and licensing status are separate. Some source and rights
+checks remain unresolved. A `reviewed` record does not by itself establish
+permission for every publication or reuse scenario.
 
-Semantic-search regression evaluation is documented in [Semantic search evaluation](docs/semantic-search-evaluation.md). Its autonomous tests run in CI; live retrieval evaluation is run separately with configured Neo4j and embedding services.
-The initial LangGraph retrieval workflow and its verification are documented in [LangGraph retrieval workflow](docs/langgraph-retrieval-workflow.md). It orchestrates existing retrieval and prepares evidence; answer generation is not yet implemented.
+`data/evaluation/semantic-search-v1.json` contains 12 historical retrieval
+checks: eight English queries and four Russian queries. It contains no
+German-language queries.
 
-## API examples
+The suite explicitly documents that it is not an independent held-out
+benchmark. Historical outcomes should not be presented as a fresh run.
 
-### Application health
+Fixed-evidence generation evaluation and retrieval evaluation cover
+different parts of the system. Neither alone establishes end-to-end answer
+quality or author approval of scientific criteria.
 
-```bash
-curl http://127.0.0.1:8000/api/v1/health
-```
+## Deployment and observability
 
-Expected response:
+`app.py` provides a Vercel application entry point. Its presence does not
+by itself establish that the current complete workflow has passed a fresh
+deployment acceptance test.
 
-```json
-{
-  "status": "ok",
-  "service": "Philosophy Influence Explorer API",
-  "environment": "development",
-  "version": "0.1.0"
-}
-```
+LangSmith-related settings exist, but operational tracing has not been
+confirmed by this audit.
 
-### Neo4j health
+## Further documentation
 
-```bash
-curl http://127.0.0.1:8000/api/v1/health/database
-```
+- [Local Neo4j setup](infra/neo4j/README.md)
+- [Semantic search evaluation](docs/semantic-search-evaluation.md)
+- [LangGraph retrieval workflow](docs/langgraph-retrieval-workflow.md)
 
-Expected response:
+These documents cover specific components and historical verification.
+For the current overall implementation status, use this README and
+the remaining roadmap.
 
-```json
-{
-  "status": "ok",
-  "database": "neo4j"
-}
-```
+## Next steps
 
-### Graph summary
+See [the roadmap](docs/roadmap.md) for the remaining scope and acceptance
+criteria.
 
-```bash
-curl http://127.0.0.1:8000/api/v1/health/database/summary
-```
+The next substantive task is to inspect the Frank materials and define
+which questions the core corpus can responsibly support, before further
+prompt experiments.
 
-Expected response after seeding:
+## Licensing
 
-```json
-{
-  "total_nodes": 9,
-  "total_relationships": 10
-}
-```
+Application code and corpus materials have separate licensing requirements.
 
-The exact totals may change as the curated graph evolves.
+The project metadata declares the MIT License for application code.
+Source texts, translations, and bibliographic materials retain their own
+licenses and copyright restrictions.
 
-## Local demo graph
-
-The seed script creates a deliberately small, curated graph for local development:
-
-- Philosophers: Nicholas of Cusa, G. W. F. Hegel, and Semyon Frank.
-- Works: _De docta ignorantia_, _Wissenschaft der Logik_, and _Непостижимое_.
-- Concepts: _docta ignorantia_, _coincidentia oppositorum_, and the absolute.
-- Structural links: authorship and conceptual discussion.
-- Two explicitly marked `candidate` conceptual relations, rather than assertions of documented historical influence.
-
-The seed graph is not a scholarly corpus. It exists to validate the data model, Neo4j integration, API contracts, and the future retrieval workflow.
-
-## Curated corpus workflow
-
-The repository contains a small multilingual starter corpus in `data/curated/`. It distinguishes primary quotations, editorial summaries, and bibliographic notes through explicit provenance fields.
-
-Validate and ingest the corpus:
-
-```bash
-uv run pytest
-docker compose up -d neo4j
-uv run python scripts/seed_curated_corpus.py
-```
-
-The corpus loader validates UTF-8 CSV files, stable IDs, references between files, passage provenance, and evidence requirements for conceptual relations before it writes to Neo4j.
-
-## Repository layout
-
-```text
-src/philosophy_influence_explorer/
-├── api/                 # HTTP routes and API composition
-├── graph/               # Neo4j client, graph queries, and curated seed data
-├── core/                # Shared infrastructure and constants (planned)
-├── domain/              # Domain models: passages, concepts, relations (planned)
-├── ingestion/           # Document-to-graph ingestion pipeline (planned)
-├── rag/                 # Retrieval, reranking, grounding, citations (planned)
-├── workflows/           # LangGraph state, nodes, and routing (planned)
-├── config.py            # Environment-based settings
-└── main.py              # FastAPI application factory
-
-infra/neo4j/
-├── init/00-schema.cypher # Version-controlled Neo4j constraints and indexes
-└── README.md             # Neo4j local development instructions
-
-scripts/
-└── seed_demo_graph.py    # Idempotent local seed-graph command
-
-tests/                    # Unit and integration tests
-```
-
-## Data and scholarly integrity
-
-This is not a system for asserting unverified historical influence. Every graph relation should include, where applicable:
-
-- Relation type, such as `direct_influence`, `citation`, `critical_engagement`, or `conceptual_affinity`.
-- Source passage or bibliographic evidence.
-- Language and translation metadata.
-- Confidence and review status.
-- A distinction between curated and LLM-extracted relations.
-
-Generated responses must cite corpus passages. If available evidence is insufficient, the application should explicitly say so.
-
-## Development roadmap
-
-- [x] Repository bootstrap, `uv`, FastAPI, configuration, health endpoint, and tests.
-- [x] Local Neo4j environment via Docker Compose.
-- [x] Version-controlled Neo4j schema and provenance-aware graph model.
-- [x] Python Neo4j client, database health endpoint, and curated seed graph.
-- [x] Curated multilingual MVP corpus with source and provenance metadata.
-- [x] Curated CSV validation and idempotent CSV-to-Neo4j ingestion.
-- [ ] Semantic/vector, full-text, and graph retrieval.
-- [ ] Source-grounded RAG responses.
-- [ ] LangGraph evidence-grade and query-rewrite workflow.
-- [ ] RU/EN/DE Next.js interface with graph visualization.
-- [x] GitHub Actions CI for unit/API tests and Chromium browser tests.
-- [ ] Evaluation data set, quality metrics, tracing, deployment automation, and deployed demo.
-
-## License
-
-This repository is intended to use the MIT License for the application code. Source texts, translations, and bibliographic metadata retain their own licenses and copyright restrictions; only legally usable materials should be added to the corpus.
+Unresolved source and rights checks are recorded in the curated data.
+Do not treat the application code's license as permission to redistribute
+all corpus materials.
