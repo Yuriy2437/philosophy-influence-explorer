@@ -165,9 +165,7 @@ def test_retrieve_semantic_failure_does_not_call_graph() -> None:
 
 def test_retrieve_graph_failure_is_not_silently_ignored() -> None:
     semantic, graph = _dependencies()
-    semantic.search.return_value = [
-        Mock(spec=RetrievedPassage, id="passage:seed")
-    ]
+    semantic.search.return_value = [Mock(spec=RetrievedPassage, id="passage:seed")]
     graph.expand.side_effect = RuntimeError("Graph expansion failed")
 
     retriever = SemanticGraphRetriever(

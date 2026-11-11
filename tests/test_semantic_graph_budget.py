@@ -99,7 +99,18 @@ def test_sufficient_budget_preserves_result_and_arguments() -> None:
     now = [100.0]
     budget = ExecutionBudget(5.0, clock=lambda: now[0])
     retriever, passages, graph, passage = dependencies()
-    filters = PassageSearchFilters(language=" en ")
+    filters = PassageSearchFilters(
+        language=" en ",
+        concept_family=" epistemology ",
+        is_verbatim=True,
+        is_editorial=False,
+    )
+    expected_filters = PassageSearchFilters(
+        language="en",
+        concept_family="epistemology",
+        is_verbatim=True,
+        is_editorial=False,
+    )
 
     result = retriever.retrieve(
         "  question  ",
@@ -116,11 +127,11 @@ def test_sufficient_budget_preserves_result_and_arguments() -> None:
     passages.search.assert_called_once_with(
         "question",
         limit=2,
-        filters=PassageSearchFilters(language="en"),
+        filters=expected_filters,
         budget=budget,
     )
     graph.expand.assert_called_once_with(
         ["passage:test"],
         limit=7,
-        filters=PassageSearchFilters(language="en"),
+        filters=expected_filters,
     )
