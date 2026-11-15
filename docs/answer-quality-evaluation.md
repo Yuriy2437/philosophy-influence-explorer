@@ -2,7 +2,14 @@
 
 ## Status
 
-Draft AI-assisted rubric pending explicit approval by the project author.
+The project author approved the case requirements of the current
+eight-case answer-quality-v1 suite, as interpreted in
+[the author-review record](answer-quality-author-review-2026-11-13.md),
+on 2026-11-13.
+
+That record also approves the assessments of the 16 specified answers
+from the controlled instruction experiment. It does not approve the
+answers from the earlier historical series or validate future answers.
 
 This is a small regression suite based on known local corpus passages.
 It is not an independent benchmark or scholarly certification.
@@ -311,7 +318,13 @@ fixed-evidence series, not repeated-sample testing or end-to-end
 answer-workflow evaluation.
 
 These observations are not a statistical estimate of reliability,
-independent scholarly review, or project-author semantic approval.
+independent scholarly review, or project-author semantic approval
+of the answers in this historical series.
+
+The subsequent author-review record concerns the separate controlled
+instruction experiment described below. It does not reassess the
+answers in this historical series.
+
 Original JSON reports remain unchanged, with manual_review fields null.
 
 ## Controlled instruction experiment
@@ -326,9 +339,10 @@ are recorded in
 [the experiment review](answer-quality-prompt-experiment-review.md).
 
 All 16 invocations returned answers and passed automatic checks.
-Under the existing draft semantic criteria, six of eight baseline
-answers and five of eight candidate answers met the criteria,
-including answers with wording caveats.
+The initial AI-assisted assessment under the then-draft semantic
+criteria found that six of eight baseline answers and five of eight
+candidate answers met the criteria, including answers with wording
+caveats.
 
 Both arms omitted the required limitation on paraphrase-p2.
 Both failed the required easy-versus-difficult contrast on q6.
@@ -338,7 +352,24 @@ regression under the plan's definition.
 
 This known-set comparison used one sample per case per arm.
 It does not establish a causal instruction effect, repeatability,
-general model quality, or project-author semantic approval.
+or general model quality. The experiment itself did not constitute
+project-author semantic approval.
+
+On 2026-11-13, the project author separately approved the requirements
+for all eight cases and the assessments of all 16 specified experiment
+answers, as documented in
+[the author-review record](answer-quality-author-review-2026-11-13.md).
+
+The approved assessments retain the same descriptive counts:
+six of eight baseline answers and five of eight candidate answers
+meet the case requirements. Wording caveats apply to baseline q5
+and candidate q2.
+
+This separate approval does not independently verify source texts,
+validate the evaluation software, or establish generalization to
+future cases. It does not populate or validate the JSON manual_review
+workflow. Original JSON reports remain unchanged, with manual_review
+fields null.
 
 The candidate did not demonstrate an advantage in this series.
 Production defaults remain unchanged; semantic-fidelity-v1 remains
@@ -348,9 +379,13 @@ an explicit evaluation-only option. The authorized sequence is complete.
 
 - A workflow for entering and validating completed manual reviews.
 - Atomic report-file publication.
-- Project-author semantic approval of the observed answers.
 - End-to-end answer-workflow evaluation.
 - Corpus snapshot comparison with Aura.
 - Model-based judging.
+
+Project-author approval is recorded separately for the current
+eight-case requirements and the 16 controlled-experiment answers.
+It is not an implemented manual-review entry or validation workflow
+and does not extend to the earlier historical answers.
 
 Production generation settings are not changed by these files.
