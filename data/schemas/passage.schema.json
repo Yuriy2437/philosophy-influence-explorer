@@ -57,6 +57,43 @@
     "is_editorial": {
       "type": "boolean"
     },
+    "acquisition_method": {
+      "type": "string",
+      "enum": [
+        "not_recorded",
+        "direct_transcription",
+        "user_excerpt",
+        "ocr"
+      ],
+      "default": "not_recorded"
+    },
+    "prepared_by": {
+      "type": "string",
+      "enum": [
+        "not_recorded",
+        "project_author",
+        "ai",
+        "other_editor"
+      ],
+      "default": "not_recorded"
+    },
+    "verification_status": {
+      "type": "string",
+      "enum": [
+        "not_recorded",
+        "not_checked",
+        "checked_against_source"
+      ],
+      "default": "not_recorded"
+    },
+    "verification_reference": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "\\S",
+      "default": null
+    },
     "translation_of_passage_id": {
       "type": "string"
     },
@@ -82,6 +119,29 @@
     }
   },
   "allOf": [
+    {
+      "if": {
+        "required": [
+          "verification_status"
+        ],
+        "properties": {
+          "verification_status": {
+            "const": "checked_against_source"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "verification_reference"
+        ],
+        "properties": {
+          "verification_reference": {
+            "type": "string",
+            "pattern": "\\S"
+          }
+        }
+      }
+    },
     {
       "if": {
         "properties": {

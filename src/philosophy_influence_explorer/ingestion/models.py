@@ -27,6 +27,32 @@ class PassageKind(StrEnum):
     TRANSLATION_REFERENCE = "translation_reference"
 
 
+class AcquisitionMethod(StrEnum):
+    """How passage text was obtained, not whether it is accurate."""
+
+    NOT_RECORDED = "not_recorded"
+    DIRECT_TRANSCRIPTION = "direct_transcription"
+    USER_EXCERPT = "user_excerpt"
+    OCR = "ocr"
+
+
+class PreparedBy(StrEnum):
+    """Who prepared the project record, not who authored the source work."""
+
+    NOT_RECORDED = "not_recorded"
+    PROJECT_AUTHOR = "project_author"
+    AI = "ai"
+    OTHER_EDITOR = "other_editor"
+
+
+class VerificationStatus(StrEnum):
+    """Recorded transcription checking, not scholarly or rights approval."""
+
+    NOT_RECORDED = "not_recorded"
+    NOT_CHECKED = "not_checked"
+    CHECKED_AGAINST_SOURCE = "checked_against_source"
+
+
 class RelationType(StrEnum):
     """Allowed relation types in the curated MVP corpus."""
 
@@ -120,6 +146,37 @@ class PassageRecord(CsvRecord):
     citation_label: str = Field(min_length=1)
     license_status: str = Field(min_length=1)
     review_status: ReviewStatus
+
+    acquisition_method: AcquisitionMethod = AcquisitionMethod.NOT_RECORDED
+    prepared_by: PreparedBy = PreparedBy.NOT_RECORDED
+    verification_status: VerificationStatus = VerificationStatus.NOT_RECORDED
+    verification_reference: str | None = None
+
+    @field_validator("acquisition_method", "prepared_by", "verification_status", mode="before")
+    @classmethod
+    def empty_provenance_value_is_not_recorded(cls, value: object) -> object:
+        """Treat blank optional CSV cells as unspecified provenance."""
+        if isinstance(value, str) and not value.strip():
+            return "not_recorded"
+        return value
+
+    @field_validator("verification_reference", mode="before")
+    @classmethod
+    def empty_verification_reference_is_none(cls, value: object) -> object:
+        """Normalize blank optional CSV references without changing text."""
+        if isinstance(value, str):
+            return value.strip() or None
+        return value
+
+    @model_validator(mode="after")
+    def validate_verification_reference(self) -> PassageRecord:
+        """Require a locator for a recorded check; do not verify the check itself."""
+        if (
+            self.verification_status is VerificationStatus.CHECKED_AGAINST_SOURCE
+            and self.verification_reference is None
+        ):
+            raise ValueError("checked_against_source requires verification_reference.")
+        return self
 
     @field_validator("translation_of_passage_id", mode="before")
     @classmethod
