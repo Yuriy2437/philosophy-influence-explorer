@@ -61,6 +61,10 @@ def build_fixed_evidence(
                 is_verbatim=record.is_verbatim,
                 is_editorial=record.is_editorial,
                 is_machine_generated=record.is_machine_generated,
+                acquisition_method=record.acquisition_method.value,
+                prepared_by=record.prepared_by.value,
+                verification_status=record.verification_status.value,
+                verification_reference=record.verification_reference,
             )
         )
 

@@ -44,6 +44,10 @@ class GraphContextPassage:
     is_verbatim: bool
     is_editorial: bool
     is_machine_generated: bool
+    acquisition_method: str = "not_recorded"
+    prepared_by: str = "not_recorded"
+    verification_status: str = "not_recorded"
+    verification_reference: str | None = None
 
 
 @dataclass(frozen=True)
@@ -170,7 +174,11 @@ class GraphContextRetriever:
                    .review_status,
                    .is_verbatim,
                    .is_editorial,
-                   .is_machine_generated
+                   .is_machine_generated,
+                   acquisition_method: coalesce(related.acquisition_method, 'not_recorded'),
+                   prepared_by: coalesce(related.prepared_by, 'not_recorded'),
+                   verification_status: coalesce(related.verification_status, 'not_recorded'),
+                   .verification_reference
                } AS passage
         """
 

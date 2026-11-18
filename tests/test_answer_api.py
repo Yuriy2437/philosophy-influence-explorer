@@ -308,6 +308,10 @@ def test_answer_preserves_nonempty_candidate_evidence(
             "is_verbatim": True,
             "is_editorial": False,
             "is_machine_generated": False,
+            "acquisition_method": "not_recorded",
+            "prepared_by": "not_recorded",
+            "verification_status": "not_recorded",
+            "verification_reference": None,
         }
     ]
 

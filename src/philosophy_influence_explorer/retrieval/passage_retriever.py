@@ -60,6 +60,10 @@ class RetrievedPassage:
     is_editorial: bool
     is_machine_generated: bool
     concepts: tuple[PassageConcept, ...]
+    acquisition_method: str = "not_recorded"
+    prepared_by: str = "not_recorded"
+    verification_status: str = "not_recorded"
+    verification_reference: str | None = None
 
 
 class PassageRetriever:
@@ -173,6 +177,10 @@ class PassageRetriever:
                node.is_verbatim AS is_verbatim,
                node.is_editorial AS is_editorial,
                node.is_machine_generated AS is_machine_generated,
+               coalesce(node.acquisition_method, 'not_recorded') AS acquisition_method,
+               coalesce(node.prepared_by, 'not_recorded') AS prepared_by,
+               coalesce(node.verification_status, 'not_recorded') AS verification_status,
+               node.verification_reference AS verification_reference,
                concepts AS concepts
         ORDER BY score DESC, id ASC
         LIMIT $limit
@@ -219,6 +227,10 @@ class PassageRetriever:
                 is_verbatim=record["is_verbatim"],
                 is_editorial=record["is_editorial"],
                 is_machine_generated=record["is_machine_generated"],
+                acquisition_method=record.get("acquisition_method") or "not_recorded",
+                prepared_by=record.get("prepared_by") or "not_recorded",
+                verification_status=record.get("verification_status") or "not_recorded",
+                verification_reference=record.get("verification_reference"),
                 concepts=tuple(
                     PassageConcept(
                         id=concept["id"],

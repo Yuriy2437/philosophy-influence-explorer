@@ -103,6 +103,10 @@ def test_preserves_exact_text_and_supported_provenance_fields(
         "is_verbatim": source.is_verbatim,
         "is_editorial": source.is_editorial,
         "is_machine_generated": source.is_machine_generated,
+        "acquisition_method": source.acquisition_method.value,
+        "prepared_by": source.prepared_by.value,
+        "verification_status": source.verification_status.value,
+        "verification_reference": source.verification_reference,
     }
 
 

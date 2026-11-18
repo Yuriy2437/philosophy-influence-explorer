@@ -204,6 +204,10 @@ def _run_passage_search(
             is_verbatim=passage.is_verbatim,
             is_editorial=passage.is_editorial,
             is_machine_generated=passage.is_machine_generated,
+            acquisition_method=passage.acquisition_method,
+            prepared_by=passage.prepared_by,
+            verification_status=passage.verification_status,
+            verification_reference=passage.verification_reference,
             concepts=[
                 PassageConceptResponse(
                     id=concept.id,

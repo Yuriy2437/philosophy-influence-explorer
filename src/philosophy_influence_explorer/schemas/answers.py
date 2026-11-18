@@ -54,6 +54,10 @@ class AnswerEvidencePassage(BaseModel):
     is_verbatim: bool
     is_editorial: bool
     is_machine_generated: bool
+    acquisition_method: str = "not_recorded"
+    prepared_by: str = "not_recorded"
+    verification_status: str = "not_recorded"
+    verification_reference: str | None = None
 
 
 class AnswerEvidenceResponse(BaseModel):

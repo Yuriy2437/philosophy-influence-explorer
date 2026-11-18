@@ -44,6 +44,10 @@ class FakeRetrievedPassage:
     is_editorial: bool
     is_machine_generated: bool
     concepts: tuple[FakePassageConcept, ...]
+    acquisition_method: str = "not_recorded"
+    prepared_by: str = "not_recorded"
+    verification_status: str = "not_recorded"
+    verification_reference: str | None = None
 
 
 class FakePassageRetriever:
@@ -151,6 +155,10 @@ def test_search_returns_results_concepts_and_filters() -> None:
                 "is_verbatim": False,
                 "is_editorial": True,
                 "is_machine_generated": False,
+                "acquisition_method": "not_recorded",
+                "prepared_by": "not_recorded",
+                "verification_status": "not_recorded",
+                "verification_reference": None,
                 "concepts": [
                     {
                         "id": "concept:becoming",
