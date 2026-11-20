@@ -286,3 +286,7 @@ licenses and copyright restrictions.
 Unresolved source and rights checks are recorded in the curated data.
 Do not treat the application code's license as permission to redistribute
 all corpus materials.
+
+## Исследования
+
+[Исследовательские материалы: полные тексты, источники и открытые вопросы](docs/research/README.md)
