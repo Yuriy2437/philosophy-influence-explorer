@@ -6,7 +6,14 @@ import json
 from enum import StrEnum
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationInfo,
+    field_validator,
+    model_validator,
+)
 
 
 class ReviewStatus(StrEnum):
@@ -152,7 +159,42 @@ class PassageRecord(CsvRecord):
     verification_status: VerificationStatus = VerificationStatus.NOT_RECORDED
     verification_reference: str | None = None
 
-    @field_validator("acquisition_method", "prepared_by", "verification_status", mode="before")
+    @model_validator(mode="before")
+    @classmethod
+    def omit_blank_seed_provenance(
+        cls,
+        value: Any,
+        info: ValidationInfo,
+    ) -> Any:
+        """Keep blank seed provenance out of model_fields_set."""
+        if not (info.context or {}).get("passage_seed"):
+            return value
+
+        if not isinstance(value, dict):
+            return value
+
+        row = dict(value)
+
+        for name in (
+            "acquisition_method",
+            "prepared_by",
+            "verification_status",
+            "verification_reference",
+        ):
+            supplied = row.get(name)
+            if supplied is None or (
+                isinstance(supplied, str) and not supplied.strip()
+            ):
+                row.pop(name, None)
+
+        return row
+
+    @field_validator(
+        "acquisition_method",
+        "prepared_by",
+        "verification_status",
+        mode="before",
+    )
     @classmethod
     def empty_provenance_value_is_not_recorded(cls, value: object) -> object:
         """Treat blank optional CSV cells as unspecified provenance."""
@@ -169,13 +211,23 @@ class PassageRecord(CsvRecord):
         return value
 
     @model_validator(mode="after")
-    def validate_verification_reference(self) -> PassageRecord:
-        """Require a locator for a recorded check; do not verify the check itself."""
+    def validate_verification_reference(
+        self,
+        info: ValidationInfo,
+    ) -> PassageRecord:
+        """Require a locator, unless seed will validate the merged record."""
+        if (info.context or {}).get("passage_seed"):
+            return self
+
         if (
-            self.verification_status is VerificationStatus.CHECKED_AGAINST_SOURCE
+            self.verification_status
+            is VerificationStatus.CHECKED_AGAINST_SOURCE
             and self.verification_reference is None
         ):
-            raise ValueError("checked_against_source requires verification_reference.")
+            raise ValueError(
+                "checked_against_source requires verification_reference."
+            )
+
         return self
 
     @field_validator("translation_of_passage_id", mode="before")
@@ -189,12 +241,16 @@ class PassageRecord(CsvRecord):
         """Enforce transparent distinctions between quotes and editorial text."""
         if self.text_kind is PassageKind.PRIMARY_QUOTE:
             if not self.is_verbatim or self.is_editorial:
-                raise ValueError("primary_quote must have is_verbatim=true and is_editorial=false.")
+                raise ValueError(
+                    "primary_quote must have is_verbatim=true "
+                    "and is_editorial=false."
+                )
 
         if self.text_kind is PassageKind.EDITORIAL_SUMMARY:
             if self.is_verbatim or not self.is_editorial:
                 raise ValueError(
-                    "editorial_summary must have is_verbatim=false and is_editorial=true."
+                    "editorial_summary must have is_verbatim=false "
+                    "and is_editorial=true."
                 )
 
         return self
@@ -237,7 +293,8 @@ class RelationRecord(CsvRecord):
             missing = sorted(required.difference(properties))
             if missing:
                 raise ValueError(
-                    "CONCEPTUALLY_RELATED_TO is missing provenance fields: " + ", ".join(missing)
+                    "CONCEPTUALLY_RELATED_TO is missing provenance fields: "
+                    + ", ".join(missing)
                 )
 
         return self

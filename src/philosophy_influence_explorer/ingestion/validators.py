@@ -24,6 +24,8 @@ class CorpusValidationError(ValueError):
 def load_csv_records[RecordT: BaseModel](
     file_path: Path,
     model_type: type[RecordT],
+    *,
+    context: dict[str, object] | None = None,
 ) -> list[RecordT]:
     """Read UTF-8 CSV records and validate every row with a Pydantic model."""
     if not file_path.exists():
@@ -35,17 +37,22 @@ def load_csv_records[RecordT: BaseModel](
         with file_path.open(encoding="utf-8", newline="") as csv_file:
             reader = csv.DictReader(csv_file)
             if reader.fieldnames is None:
-                raise CorpusValidationError(f"CSV file has no header: {file_path}")
+                raise CorpusValidationError(
+                    f"CSV file has no header: {file_path}")
 
             for row_number, row in enumerate(reader, start=2):
                 try:
-                    records.append(model_type.model_validate(row))
+                    records.append(
+                        model_type.model_validate(row, context=context)
+                    )
                 except ValidationError as error:
                     raise CorpusValidationError(
                         f"{file_path.name}, row {row_number}: {error}"
                     ) from error
     except UnicodeDecodeError as error:
-        raise CorpusValidationError(f"{file_path.name} must use UTF-8 encoding.") from error
+        raise CorpusValidationError(
+            f"{file_path.name} must use UTF-8 encoding."
+        ) from error
 
     ensure_unique_ids(records, file_path.name)
     return records
@@ -55,15 +62,28 @@ def ensure_unique_ids(records: list[BaseModel], file_name: str) -> None:
     """Reject duplicate stable identifiers within one CSV file."""
     identifiers = [record.id for record in records]
     duplicates = sorted(
-        identifier for identifier in set(identifiers) if identifiers.count(identifier) > 1
+        identifier
+        for identifier in set(identifiers)
+        if identifiers.count(identifier) > 1
     )
 
     if duplicates:
-        raise CorpusValidationError(f"{file_name} contains duplicate IDs: {', '.join(duplicates)}")
+        raise CorpusValidationError(
+            f"{file_name} contains duplicate IDs: {', '.join(duplicates)}"
+        )
 
 
-def validate_curated_corpus(corpus_dir: Path) -> dict[str, list[BaseModel]]:
-    """Load all curated CSV files and validate cross-file references."""
+def validate_curated_corpus(
+    corpus_dir: Path,
+    *,
+    for_seed: bool = False,
+) -> dict[str, list[BaseModel]]:
+    """Load the corpus and validate references.
+
+    Seed mode preserves which passage provenance values were supplied.
+    Verification status/reference consistency is then checked against the
+    merged database record inside the seed transaction.
+    """
     philosophers = load_csv_records(
         corpus_dir / "philosophers.csv",
         PhilosopherRecord,
@@ -71,7 +91,11 @@ def validate_curated_corpus(corpus_dir: Path) -> dict[str, list[BaseModel]]:
     works = load_csv_records(corpus_dir / "works.csv", WorkRecord)
     concepts = load_csv_records(corpus_dir / "concepts.csv", ConceptRecord)
     sources = load_csv_records(corpus_dir / "sources.csv", SourceRecord)
-    passages = load_csv_records(corpus_dir / "passages.csv", PassageRecord)
+    passages = load_csv_records(
+        corpus_dir / "passages.csv",
+        PassageRecord,
+        context={"passage_seed": True} if for_seed else None,
+    )
     relations = load_csv_records(corpus_dir / "relations.csv", RelationRecord)
 
     all_ids = {
@@ -80,8 +104,14 @@ def validate_curated_corpus(corpus_dir: Path) -> dict[str, list[BaseModel]]:
         for record in collection
     }
 
-    validate_work_references(works, philosopher_ids={record.id for record in philosophers})
-    validate_work_sources(works, source_ids={record.id for record in sources})
+    validate_work_references(
+        works,
+        philosopher_ids={record.id for record in philosophers},
+    )
+    validate_work_sources(
+        works,
+        source_ids={record.id for record in sources},
+    )
     validate_passage_references(
         passages,
         work_ids={record.id for record in works},
@@ -108,7 +138,8 @@ def validate_work_references(
     for work in works:
         if work.philosopher_id not in philosopher_ids:
             raise CorpusValidationError(
-                f"{work.id} references unknown philosopher: {work.philosopher_id}"
+                f"{work.id} references unknown philosopher: "
+                f"{work.philosopher_id}"
             )
 
 
@@ -119,7 +150,9 @@ def validate_work_sources(
     """Ensure every work points to a known source record."""
     for work in works:
         if work.source_id not in source_ids:
-            raise CorpusValidationError(f"{work.id} references unknown source: {work.source_id}")
+            raise CorpusValidationError(
+                f"{work.id} references unknown source: {work.source_id}"
+            )
 
 
 def validate_passage_references(
@@ -130,7 +163,9 @@ def validate_passage_references(
     """Ensure every passage points to known work and source records."""
     for passage in passages:
         if passage.work_id not in work_ids:
-            raise CorpusValidationError(f"{passage.id} references unknown work: {passage.work_id}")
+            raise CorpusValidationError(
+                f"{passage.id} references unknown work: {passage.work_id}"
+            )
         if passage.source_id not in source_ids:
             raise CorpusValidationError(
                 f"{passage.id} references unknown source: {passage.source_id}"
@@ -156,6 +191,10 @@ def validate_relation_references(
     """Ensure each relation points to graph entities present in this corpus."""
     for relation in relations:
         if relation.from_id not in all_ids:
-            raise CorpusValidationError(f"{relation.id} has unknown from_id: {relation.from_id}")
+            raise CorpusValidationError(
+                f"{relation.id} has unknown from_id: {relation.from_id}"
+            )
         if relation.to_id not in all_ids:
-            raise CorpusValidationError(f"{relation.id} has unknown to_id: {relation.to_id}")
+            raise CorpusValidationError(
+                f"{relation.id} has unknown to_id: {relation.to_id}"
+            )
