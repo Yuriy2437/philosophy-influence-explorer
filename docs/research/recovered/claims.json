@@ -1,0 +1,410 @@
+{
+  "format": "research-recovery-register",
+  "format_version": 1,
+  "date": "2026-11-20",
+  "baseline": "1344b23",
+  "completeness": "partial_recovery_not_full_chat_archive",
+  "runtime_integration": false,
+  "source_documents": {
+    "S-CUS-NOTES": {
+      "filename": "CUSANUS.docx",
+      "sha256": "68a9ebaa70bcffb9dadcd44acdbf1ca67aa177acd91ec01eede107dc2ca947eb",
+      "paragraph_count": 149
+    },
+    "S-COMP-A": {
+      "filename": "ANALIZ_PALAMA_KUZ.docx",
+      "sha256": "fa96400b9e6d362751ad82921b69dfd94a23ea9ff114e906e43d25a5f60b29d4",
+      "paragraph_count": 173
+    },
+    "S-COMP-B": {
+      "filename": "NOVYI_kuzanskii_palama.docx",
+      "sha256": "433c68262876a7755729fd64099c7501e93d4832ec524822f8b4948017b233e3",
+      "paragraph_count": 404
+    },
+    "S-PAL-EXCERPTS": {
+      "filename": "PALAMA-KUZANSKII.docx",
+      "sha256": "e26fbab801dc7c9c23633df6e61d8333fb8f8f8e5fe85eda51baa7e2cc4d67a4",
+      "paragraph_count": 216
+    },
+    "S-DISS": {
+      "filename": "Bespechanskiy_dissertatsia.docx",
+      "sha256": "021e30fcdf257bed32e25ea334890da7502513db538f8f2409529389e7fd8280",
+      "paragraph_count": 652
+    }
+  },
+  "claims": [
+    {
+      "id": "REC-PAL-001",
+      "subject": "palamas",
+      "statement": "В подборке выписок различаются видение, апофатическое отрицание и единение; самопревосхождение ума не представлено как видение сущности Бога.",
+      "kind": "recovered_excerpt_theme",
+      "origin": "user_supplied_document",
+      "sources": [
+        {
+          "source": "S-PAL-EXCERPTS",
+          "nonempty_paragraph": 10,
+          "locator_in_note": "Триады I 3,4"
+        }
+      ],
+      "limitations": "Проверена выписка, не заново первичный текст или соответствие русского перевода изданию.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    },
+    {
+      "id": "REC-PAL-002",
+      "subject": "palamas",
+      "statement": "В выписках оставление умственной деятельности не отождествляется с простой пустотой или с произвольно достигаемым состоянием.",
+      "kind": "recovered_excerpt_theme",
+      "origin": "user_supplied_document",
+      "sources": [
+        {
+          "source": "S-PAL-EXCERPTS",
+          "nonempty_paragraph": 23,
+          "locator_in_note": "Триады I 3,19"
+        }
+      ],
+      "limitations": "Поддержка по предоставленной подборке; первичная сверка не выполнена в этом восстановлении.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    },
+    {
+      "id": "REC-PAL-003",
+      "subject": "palamas",
+      "statement": "Формула об уме, выходящем из себя, и Боге, выходящем к нам, присутствует в исследовательском конспекте.",
+      "kind": "recovered_research_note",
+      "origin": "user_supplied_document",
+      "sources": [
+        {
+          "source": "S-COMP-B",
+          "nonempty_paragraph": 35,
+          "locator_in_note": "стр. 14, система пагинации конспекта не установлена"
+        }
+      ],
+      "limitations": "Не выдавать весь конспективный тезис за дословные слова Паламы или доказанный тезис о сущности Бога.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    },
+    {
+      "id": "REC-DIO-001",
+      "subject": "dionysius",
+      "statement": "В подборке Паламы есть прямые обращения к Дионисию, в том числе с локаторами I 1,16; I 1,23; I 3,19.",
+      "kind": "reported_reception",
+      "origin": "user_supplied_document",
+      "sources": [
+        {
+          "source": "S-PAL-EXCERPTS",
+          "nonempty_paragraph": 1
+        },
+        {
+          "source": "S-PAL-EXCERPTS",
+          "nonempty_paragraph": 3
+        },
+        {
+          "source": "S-PAL-EXCERPTS",
+          "nonempty_paragraph": 23
+        }
+      ],
+      "limitations": "Различать цитирование Дионисия Паламой и независимую сверку с Дионисием; последняя не выполнена.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    },
+    {
+      "id": "REC-DIO-002",
+      "subject": "dionysius",
+      "statement": "В прочитанном контексте «Берилла», раздел 22, n. 32, Кузанский прямо упоминает Дионисия.",
+      "kind": "direct_reference_located",
+      "origin": "primary_text_extraction",
+      "sources": [
+        {
+          "source": "P-CUSA-T2",
+          "locator": "Берилл, раздел 22, n. 32, с. 111–112"
+        }
+      ],
+      "limitations": "Само по себе не доказывает посредничество Паламы или тождество трактовок Дионисия.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    },
+    {
+      "id": "REC-CUS-001",
+      "subject": "cusanus",
+      "statement": "Утверждены границы локального фрагмента «Простеца о мудрости», I, с. 367: от постижения непостижимой красоты до постижимости непостижимости.",
+      "kind": "approved_passage_boundaries",
+      "origin": "conversation",
+      "sources": [
+        {
+          "source": "P-CUSA-T1",
+          "locator": "Простец о мудрости I, с. 367"
+        },
+        {
+          "source": "P-CUSA-PAGES",
+          "locator": "с. 366–367"
+        }
+      ],
+      "limitations": "Утверждены границы, не автоматически все интерпретации, права или новая визуальная сверка.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    },
+    {
+      "id": "REC-CUS-002",
+      "subject": "cusanus",
+      "statement": "Содержание тома 1 и примечания относят перевод книг I–II «Простеца о мудрости» к З. А. Тажуризиной.",
+      "kind": "bibliographic_attribution",
+      "origin": "primary_text_extraction",
+      "sources": [
+        {
+          "source": "P-CUSA-T1",
+          "locator": "содержание, PDF-лист 482; примечания, печатная с. 483"
+        }
+      ],
+      "limitations": "Атрибуция относится к этим книгам, не ко всему тому; новая визуальная проверка не проведена.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    },
+    {
+      "id": "REC-CUS-003",
+      "subject": "cusanus",
+      "statement": "В пользовательской диссертации уже сопоставлены non aliud, знание/незнание и опытное познание абсолютного.",
+      "kind": "recovered_author_interpretation",
+      "origin": "user_dissertation",
+      "sources": [
+        {
+          "source": "S-DISS",
+          "nonempty_paragraph": 123
+        }
+      ],
+      "limitations": "Пересказ авторской аргументации; не независимое подтверждение цитат и не установленное влияние.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    },
+    {
+      "id": "REC-FRA-001",
+      "subject": "frank",
+      "statement": "На с. 184 «Непостижимого» Франк выделяет Кузанского как своего учителя с оговоркой «в некотором смысле» и описывает задачу книги как развитие основного начала его мировоззрения.",
+      "kind": "author_self_report",
+      "origin": "primary_text_extraction",
+      "sources": [
+        {
+          "source": "P-FRANK-1990",
+          "locator": "с. 184; PDF-лист 186"
+        }
+      ],
+      "limitations": "Сохранить оговорку и новые пути/формы развития; не выводить источник каждого положения.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    },
+    {
+      "id": "REC-FRA-002",
+      "subject": "frank",
+      "statement": "С. 196 различает недоступность постигающей мысли и доступность опытному сознанию; во введении реальная значимость допущения ещё гипотетична.",
+      "kind": "argument_located",
+      "origin": "primary_text_extraction",
+      "sources": [
+        {
+          "source": "P-FRANK-1990",
+          "locator": "с. 196; PDF-лист 198"
+        }
+      ],
+      "limitations": "Не представлять вводное допущение завершённым доказательством всей книги.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    },
+    {
+      "id": "REC-FRA-003",
+      "subject": "frank",
+      "statement": "На с. 198 названы wissendes Nichtwissen и docta ignorantia; сохраняются условные формулировки вводного рассуждения.",
+      "kind": "terminology_located",
+      "origin": "primary_text_extraction",
+      "sources": [
+        {
+          "source": "P-FRANK-1990",
+          "locator": "с. 198; PDF-лист 200"
+        }
+      ],
+      "limitations": "Одно латинское выражение не устанавливает конкретный источник или маршрут передачи.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    },
+    {
+      "id": "REC-FRA-004",
+      "subject": "frank",
+      "statement": "На с. 292 и 295 Франк прямо называет Кузанского при обсуждении non aliud и несводимости Абсолютного к разделительным или соединительным определениям.",
+      "kind": "direct_reference_located",
+      "origin": "primary_text_extraction",
+      "sources": [
+        {
+          "source": "P-FRANK-1990",
+          "locator": "с. 292–295, непосредственно 292 и 295"
+        }
+      ],
+      "limitations": "Посредующее издание и точные источники всех формул требуют адресной локализации; задача не объявлена закрытой.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    },
+    {
+      "id": "REC-FRA-005",
+      "subject": "frank",
+      "statement": "Цитата Кузанского на с. 313 локализована в «Берилле», раздел 22, n. 32; дальнейшее развёртывание монодуализма отделяется от границ цитаты.",
+      "kind": "direct_reception",
+      "origin": "conversation_and_primary_extraction",
+      "sources": [
+        {
+          "source": "P-FRANK-1990",
+          "locator": "с. 312–315"
+        },
+        {
+          "source": "P-CUSA-T2",
+          "locator": "Берилл, с. 111–112"
+        }
+      ],
+      "limitations": "Не утверждать, что вся система Франка заимствована из этого места; издание-посредник не установлено.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    },
+    {
+      "id": "REC-FRA-006",
+      "subject": "frank",
+      "statement": "В разговоре предложено сопоставление «Предмета знания», «Души человека», «Непостижимого», «Реальности и человека» по живому знанию и пределам понятийного выражения.",
+      "kind": "provisional_comparison",
+      "origin": "ai_interpretation",
+      "sources": [
+        {
+          "source": "WEB-FRANK-KNOWLEDGE",
+          "locator": "часть III, глава 10, § 3 — предварительный локатор"
+        },
+        {
+          "source": "WEB-FRANK-SOUL",
+          "locator": "глава VII"
+        },
+        {
+          "source": "WEB-FRANK-REALITY",
+          "locator": "предисловие, глава I"
+        }
+      ],
+      "limitations": "Обобщение не утверждено по пунктам; опорные электронные тексты и точные границы нужно адресно подтвердить перед машинным evidence.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    },
+    {
+      "id": "REC-HEI-001",
+      "subject": "heidegger",
+      "statement": "Диссертация обсуждает эк-зистенцию как выступание в истину Бытия и отличает её от действительного существования в смысле existentia/actualitas.",
+      "kind": "recovered_author_interpretation",
+      "origin": "user_dissertation",
+      "sources": [
+        {
+          "source": "S-DISS",
+          "nonempty_paragraph": 284
+        }
+      ],
+      "limitations": "Это восстановление авторского изложения; оригинал Хайдеггера и сноска здесь не проверены.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    },
+    {
+      "id": "REC-HEI-002",
+      "subject": "heidegger",
+      "statement": "Ранее поставлен вопрос о соотношении конечного Dasein, открытости Бытию и De possest Кузанского.",
+      "kind": "recovered_question",
+      "origin": "conversation_memory",
+      "sources": [],
+      "limitations": "Точная прошлая аргументация не восстановлена; не считать установленным тождество Dasein, Бытия, бесконечности и Бога.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    },
+    {
+      "id": "REC-HEI-003",
+      "subject": "heidegger",
+      "statement": "В диссертации сохранено этимологическое сближение экзистенции и экстаза.",
+      "kind": "recovered_author_hypothesis",
+      "origin": "user_dissertation",
+      "sources": [
+        {
+          "source": "S-DISS",
+          "nonempty_paragraph": 250
+        }
+      ],
+      "limitations": "Этимология не подтверждена; нельзя доказывать общность учений через созвучие ex-/ek-.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    },
+    {
+      "id": "REC-HUS-001",
+      "subject": "husserl",
+      "statement": "Диссертация связывает обсуждение абсолютного с чистым сознанием и феноменологическим исследованием переживаний.",
+      "kind": "recovered_author_interpretation",
+      "origin": "user_dissertation",
+      "sources": [
+        {
+          "source": "S-DISS",
+          "nonempty_paragraph": 190
+        },
+        {
+          "source": "S-DISS",
+          "nonempty_paragraph": 197
+        }
+      ],
+      "limitations": "Слова «абсолютное сознание» не приравнивать автоматически к Богу или метафизическому Абсолюту; цитаты в диссертации не пересверялись.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    },
+    {
+      "id": "REC-HUS-002",
+      "subject": "husserl",
+      "statement": "В прежнем обсуждении намечены «Картезианские медитации», «Кризис», «Идеи I–II» и исследования внутреннего сознания времени.",
+      "kind": "recovered_reading_plan",
+      "origin": "conversation_memory",
+      "sources": [],
+      "limitations": "План чтения не равен исследованному корпусу; готовых подтверждённых выводов по всем этим работам сейчас нет.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    },
+    {
+      "id": "REC-METHOD-001",
+      "subject": "method",
+      "statement": "Диссертация различает сравнительную конвергенцию философских линий и историческое взаимовлияние.",
+      "kind": "recovered_author_method",
+      "origin": "user_dissertation",
+      "sources": [
+        {
+          "source": "S-DISS",
+          "nonempty_paragraph": 48
+        }
+      ],
+      "limitations": "Универсальность бытийной истины в этом месте — авторская философская позиция, не нейтрально доказанная предпосылка проекта.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    },
+    {
+      "id": "REC-HYP-001",
+      "subject": "method",
+      "statement": "Общая гипотеза проекта: исследовать непространственный выход за пределы себя у человека и возможную связь с самораскрытием Абсолюта.",
+      "kind": "research_hypothesis",
+      "origin": "conversation",
+      "sources": [],
+      "limitations": "Не объявлять сущность Бога экстатической у всех авторов; у Паламы отдельно учитывать сущность, проявление и причастность.",
+      "author_review": "pending",
+      "corpus_import": "not_performed",
+      "application_use": "not_connected"
+    }
+  ]
+}
