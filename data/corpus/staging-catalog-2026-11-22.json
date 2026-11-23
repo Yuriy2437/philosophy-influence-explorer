@@ -1,0 +1,848 @@
+{
+  "format": "offline-corpus-staging",
+  "version": 1,
+  "prepared_on": "2026-11-22",
+  "runtime_schema": false,
+  "sources": [
+    {
+      "id": "cusanus-ru-1979-v1",
+      "author": "cusanus",
+      "language": "ru",
+      "original_filename": "Nikolai-Kuzanskii-Sochineniia-v-2-kh-tomakh-t.1-Filosofskoe-nasledie-t.80-1979.pdf",
+      "original_sha256": "cf2e9d25140e81bc5afad968c17b2bad7965aa9362786b686d7e2796e38d8563",
+      "original_bytes": 29517616,
+      "pdf_leaves": 483,
+      "extracted_characters": 1057919,
+      "textless_leaves": [
+        1,
+        2,
+        3,
+        4,
+        6,
+        483
+      ],
+      "extraction_engine": "pdftotext pdftotext version 26.01.0",
+      "extraction_options": [
+        "-enc",
+        "UTF-8",
+        "-layout"
+      ],
+      "acquisition": "user_uploaded_pdf",
+      "new_ocr_performed": false,
+      "verification_status": "not_checked",
+      "edition_completeness": "not_visually_audited",
+      "license_status": "rights_to_verify",
+      "permissions": {
+        "public_full_text_distribution": "not_established",
+        "external_provider_processing": "not_established"
+      },
+      "original_pdf_in_package": false,
+      "pages_path": "extracted/cusanus-ru-1979-v1/pages.jsonl"
+    },
+    {
+      "id": "cusanus-ru-1980-v2",
+      "author": "cusanus",
+      "language": "ru",
+      "original_filename": "Nikolai-Kuzanskii-Sochineniia-v-2-kh-tomakh-t.2-Filosofskoe-nasledie-t.82-1980.pdf",
+      "original_sha256": "c6398de17b227b94e8b0909a44e569c8ce2013e652a1fe558560d187a71d33d8",
+      "original_bytes": 27664282,
+      "pdf_leaves": 459,
+      "extracted_characters": 993172,
+      "textless_leaves": [
+        1,
+        2,
+        3,
+        459
+      ],
+      "extraction_engine": "pdftotext pdftotext version 26.01.0",
+      "extraction_options": [
+        "-enc",
+        "UTF-8",
+        "-layout"
+      ],
+      "acquisition": "user_uploaded_pdf",
+      "new_ocr_performed": false,
+      "verification_status": "not_checked",
+      "edition_completeness": "not_visually_audited",
+      "license_status": "rights_to_verify",
+      "permissions": {
+        "public_full_text_distribution": "not_established",
+        "external_provider_processing": "not_established"
+      },
+      "original_pdf_in_package": false,
+      "pages_path": "extracted/cusanus-ru-1980-v2/pages.jsonl"
+    },
+    {
+      "id": "frank-ru-1990",
+      "author": "frank",
+      "language": "ru",
+      "original_filename": "frank_sochineniya_1990__ocr.pdf",
+      "original_sha256": "9522313457d6bd9416a244cdc5e6b95fc1592a606bc58d68ebae069a8150696a",
+      "original_bytes": 27746408,
+      "pdf_leaves": 610,
+      "extracted_characters": 1422320,
+      "textless_leaves": [
+        1,
+        2,
+        12,
+        68,
+        80,
+        114
+      ],
+      "extraction_engine": "pdftotext pdftotext version 26.01.0",
+      "extraction_options": [
+        "-enc",
+        "UTF-8",
+        "-layout"
+      ],
+      "acquisition": "user_uploaded_pdf",
+      "new_ocr_performed": false,
+      "verification_status": "not_checked",
+      "edition_completeness": "not_visually_audited",
+      "license_status": "rights_to_verify",
+      "permissions": {
+        "public_full_text_distribution": "not_established",
+        "external_provider_processing": "not_established"
+      },
+      "original_pdf_in_package": false,
+      "pages_path": "extracted/frank-ru-1990/pages.jsonl"
+    }
+  ],
+  "works": [
+    {
+      "source_id": "cusanus-ru-1979-v1",
+      "local_work_id": "cusanus:de-docta-ignorantia",
+      "title": "Об учёном незнании",
+      "translators": [
+        "В. В. Бибихин"
+      ],
+      "existing_project_work_id": "work:cusanus:de-docta-ignorantia",
+      "language": "ru",
+      "author": "cusanus",
+      "span": {
+        "start": {
+          "pdf_leaf": 48,
+          "char": 0
+        },
+        "end_exclusive": {
+          "pdf_leaf": 185,
+          "char": 0
+        }
+      },
+      "fragment_count": 137,
+      "characters": 299011,
+      "pages_path": "normalized/cusanus/de-docta-ignorantia/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "cusanus-ru-1979-v1",
+      "local_work_id": "cusanus:de-coniecturis",
+      "title": "О предположениях",
+      "translators": [
+        "З. А. Тажуризина",
+        "В. В. Бибихин"
+      ],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "cusanus",
+      "span": {
+        "start": {
+          "pdf_leaf": 185,
+          "char": 0
+        },
+        "end_exclusive": {
+          "pdf_leaf": 279,
+          "char": 0
+        }
+      },
+      "fragment_count": 94,
+      "characters": 201740,
+      "pages_path": "normalized/cusanus/de-coniecturis/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "cusanus-ru-1979-v1",
+      "local_work_id": "cusanus:de-deo-abscondito",
+      "title": "О сокрытом Боге",
+      "translators": [
+        "В. В. Бибихин"
+      ],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "cusanus",
+      "span": {
+        "start": {
+          "pdf_leaf": 280,
+          "char": 15
+        },
+        "end_exclusive": {
+          "pdf_leaf": 285,
+          "char": 286
+        }
+      },
+      "fragment_count": 6,
+      "characters": 9968,
+      "pages_path": "normalized/cusanus/de-deo-abscondito/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "cusanus-ru-1979-v1",
+      "local_work_id": "cusanus:de-quaerendo-deum",
+      "title": "Об искании Бога",
+      "translators": [
+        "В. В. Бибихин"
+      ],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "cusanus",
+      "span": {
+        "start": {
+          "pdf_leaf": 285,
+          "char": 286
+        },
+        "end_exclusive": {
+          "pdf_leaf": 300,
+          "char": 1771
+        }
+      },
+      "fragment_count": 16,
+      "characters": 34783,
+      "pages_path": "normalized/cusanus/de-quaerendo-deum/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "cusanus-ru-1979-v1",
+      "local_work_id": "cusanus:de-filiatione-dei",
+      "title": "О богосыновстве",
+      "translators": [
+        "В. В. Бибихин"
+      ],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "cusanus",
+      "span": {
+        "start": {
+          "pdf_leaf": 300,
+          "char": 1771
+        },
+        "end_exclusive": {
+          "pdf_leaf": 318,
+          "char": 257
+        }
+      },
+      "fragment_count": 19,
+      "characters": 39047,
+      "pages_path": "normalized/cusanus/de-filiatione-dei/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "cusanus-ru-1979-v1",
+      "local_work_id": "cusanus:de-dato-patris-luminum",
+      "title": "О даре Отца светов",
+      "translators": [
+        "В. В. Бибихин"
+      ],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "cusanus",
+      "span": {
+        "start": {
+          "pdf_leaf": 318,
+          "char": 257
+        },
+        "end_exclusive": {
+          "pdf_leaf": 332,
+          "char": 1715
+        }
+      },
+      "fragment_count": 15,
+      "characters": 32868,
+      "pages_path": "normalized/cusanus/de-dato-patris-luminum/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "cusanus-ru-1979-v1",
+      "local_work_id": "cusanus:de-genesi",
+      "title": "Диалог о становлении",
+      "translators": [
+        "В. В. Бибихин"
+      ],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "cusanus",
+      "span": {
+        "start": {
+          "pdf_leaf": 332,
+          "char": 1715
+        },
+        "end_exclusive": {
+          "pdf_leaf": 355,
+          "char": 0
+        }
+      },
+      "fragment_count": 23,
+      "characters": 50296,
+      "pages_path": "normalized/cusanus/de-genesi/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "cusanus-ru-1979-v1",
+      "local_work_id": "cusanus:idiota-de-sapientia",
+      "title": "Простец о мудрости, книги I–II",
+      "translators": [
+        "З. А. Тажуризина"
+      ],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "cusanus",
+      "span": {
+        "start": {
+          "pdf_leaf": 356,
+          "char": 0
+        },
+        "end_exclusive": {
+          "pdf_leaf": 380,
+          "char": 1830
+        }
+      },
+      "fragment_count": 25,
+      "characters": 53785,
+      "pages_path": "normalized/cusanus/idiota-de-sapientia/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "cusanus-ru-1979-v1",
+      "local_work_id": "cusanus:idiota-de-mente",
+      "title": "Простец об уме",
+      "translators": [
+        "А. Ф. Лосев"
+      ],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "cusanus",
+      "span": {
+        "start": {
+          "pdf_leaf": 380,
+          "char": 1830
+        },
+        "end_exclusive": {
+          "pdf_leaf": 439,
+          "char": 1198
+        }
+      },
+      "fragment_count": 60,
+      "characters": 127547,
+      "pages_path": "normalized/cusanus/idiota-de-mente/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "cusanus-ru-1979-v1",
+      "local_work_id": "cusanus:idiota-de-staticis-experimentis",
+      "title": "Простец об опытах с весами",
+      "translators": [
+        "В. В. Бибихин"
+      ],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "cusanus",
+      "span": {
+        "start": {
+          "pdf_leaf": 439,
+          "char": 1198
+        },
+        "end_exclusive": {
+          "pdf_leaf": 456,
+          "char": 0
+        }
+      },
+      "fragment_count": 17,
+      "characters": 35214,
+      "pages_path": "normalized/cusanus/idiota-de-staticis-experimentis/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "cusanus-ru-1980-v2",
+      "local_work_id": "cusanus:apologia-doctae-ignorantiae",
+      "title": "Апология учёного незнания",
+      "translators": null,
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "cusanus",
+      "span": {
+        "start": {
+          "pdf_leaf": 6,
+          "char": 0
+        },
+        "end_exclusive": {
+          "pdf_leaf": 33,
+          "char": 0
+        }
+      },
+      "fragment_count": 27,
+      "characters": 57486,
+      "pages_path": "normalized/cusanus/apologia-doctae-ignorantiae/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "cusanus-ru-1980-v2",
+      "local_work_id": "cusanus:de-visione-dei",
+      "title": "О видении Бога",
+      "translators": [
+        "В. В. Бибихин"
+      ],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "cusanus",
+      "span": {
+        "start": {
+          "pdf_leaf": 33,
+          "char": 0
+        },
+        "end_exclusive": {
+          "pdf_leaf": 94,
+          "char": 0
+        }
+      },
+      "fragment_count": 61,
+      "characters": 135426,
+      "pages_path": "normalized/cusanus/de-visione-dei/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "cusanus-ru-1980-v2",
+      "local_work_id": "cusanus:de-beryllo",
+      "title": "Берилл",
+      "translators": [
+        "В. В. Бибихин"
+      ],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "cusanus",
+      "span": {
+        "start": {
+          "pdf_leaf": 94,
+          "char": 0
+        },
+        "end_exclusive": {
+          "pdf_leaf": 132,
+          "char": 0
+        }
+      },
+      "fragment_count": 38,
+      "characters": 80171,
+      "pages_path": "normalized/cusanus/de-beryllo/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "cusanus-ru-1980-v2",
+      "local_work_id": "cusanus:de-possest",
+      "title": "О возможности-бытии",
+      "translators": [
+        "А. Ф. Лосев"
+      ],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "cusanus",
+      "span": {
+        "start": {
+          "pdf_leaf": 132,
+          "char": 0
+        },
+        "end_exclusive": {
+          "pdf_leaf": 178,
+          "char": 0
+        }
+      },
+      "fragment_count": 46,
+      "characters": 96964,
+      "pages_path": "normalized/cusanus/de-possest/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "cusanus-ru-1980-v2",
+      "local_work_id": "cusanus:de-non-aliud",
+      "title": "О неином",
+      "translators": [
+        "А. Ф. Лосев"
+      ],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "cusanus",
+      "span": {
+        "start": {
+          "pdf_leaf": 178,
+          "char": 0
+        },
+        "end_exclusive": {
+          "pdf_leaf": 242,
+          "char": 0
+        }
+      },
+      "fragment_count": 64,
+      "characters": 137682,
+      "pages_path": "normalized/cusanus/de-non-aliud/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "cusanus-ru-1980-v2",
+      "local_work_id": "cusanus:de-ludo-globi",
+      "title": "Игра в шар, книги I–II",
+      "translators": [
+        "В. В. Бибихин"
+      ],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "cusanus",
+      "span": {
+        "start": {
+          "pdf_leaf": 242,
+          "char": 0
+        },
+        "end_exclusive": {
+          "pdf_leaf": 308,
+          "char": 0
+        }
+      },
+      "fragment_count": 66,
+      "characters": 141837,
+      "pages_path": "normalized/cusanus/de-ludo-globi/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "cusanus-ru-1980-v2",
+      "local_work_id": "cusanus:compendium",
+      "title": "Компендий",
+      "translators": [
+        "В. В. Бибихин"
+      ],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "cusanus",
+      "span": {
+        "start": {
+          "pdf_leaf": 308,
+          "char": 0
+        },
+        "end_exclusive": {
+          "pdf_leaf": 332,
+          "char": 0
+        }
+      },
+      "fragment_count": 24,
+      "characters": 49430,
+      "pages_path": "normalized/cusanus/compendium/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "cusanus-ru-1980-v2",
+      "local_work_id": "cusanus:de-venatione-sapientiae",
+      "title": "Охота за мудростью",
+      "translators": [
+        "В. В. Бибихин"
+      ],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "cusanus",
+      "span": {
+        "start": {
+          "pdf_leaf": 332,
+          "char": 0
+        },
+        "end_exclusive": {
+          "pdf_leaf": 405,
+          "char": 0
+        }
+      },
+      "fragment_count": 73,
+      "characters": 159586,
+      "pages_path": "normalized/cusanus/de-venatione-sapientiae/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "cusanus-ru-1980-v2",
+      "local_work_id": "cusanus:de-apice-theoriae",
+      "title": "О вершине созерцания",
+      "translators": [
+        "В. В. Бибихин"
+      ],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "cusanus",
+      "span": {
+        "start": {
+          "pdf_leaf": 405,
+          "char": 0
+        },
+        "end_exclusive": {
+          "pdf_leaf": 418,
+          "char": 0
+        }
+      },
+      "fragment_count": 13,
+      "characters": 26216,
+      "pages_path": "normalized/cusanus/de-apice-theoriae/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "frank-ru-1990",
+      "local_work_id": "frank:nietzsche-ethics",
+      "title": "Фр. Ницше и этика любви к дальнему",
+      "translators": [],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "frank",
+      "span": {
+        "start": {
+          "pdf_leaf": 11,
+          "char": 0
+        },
+        "end_exclusive": {
+          "pdf_leaf": 67,
+          "char": 0
+        }
+      },
+      "fragment_count": 55,
+      "characters": 125216,
+      "pages_path": "normalized/frank/nietzsche-ethics/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "frank-ru-1990",
+      "local_work_id": "frank:politics-and-ideas",
+      "title": "Политика и идеи",
+      "translators": [],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "frank",
+      "span": {
+        "start": {
+          "pdf_leaf": 67,
+          "char": 0
+        },
+        "end_exclusive": {
+          "pdf_leaf": 79,
+          "char": 0
+        }
+      },
+      "fragment_count": 11,
+      "characters": 22624,
+      "pages_path": "normalized/frank/politics-and-ideas/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "frank-ru-1990",
+      "local_work_id": "frank:ethics-of-nihilism",
+      "title": "Этика нигилизма",
+      "translators": [],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "frank",
+      "span": {
+        "start": {
+          "pdf_leaf": 79,
+          "char": 0
+        },
+        "end_exclusive": {
+          "pdf_leaf": 113,
+          "char": 0
+        }
+      },
+      "fragment_count": 33,
+      "characters": 75714,
+      "pages_path": "normalized/frank/ethics-of-nihilism/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "frank-ru-1990",
+      "local_work_id": "frank:krushenie-kumirov",
+      "title": "Крушение кумиров",
+      "translators": [],
+      "existing_project_work_id": null,
+      "language": "ru",
+      "author": "frank",
+      "span": {
+        "start": {
+          "pdf_leaf": 113,
+          "char": 0
+        },
+        "end_exclusive": {
+          "pdf_leaf": 183,
+          "char": 0
+        }
+      },
+      "fragment_count": 69,
+      "characters": 159293,
+      "pages_path": "normalized/frank/krushenie-kumirov/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    },
+    {
+      "source_id": "frank-ru-1990",
+      "local_work_id": "frank:nepostizhimoe",
+      "title": "Непостижимое",
+      "translators": [],
+      "existing_project_work_id": "work:frank:nepostizhimoe",
+      "language": "ru",
+      "author": "frank",
+      "span": {
+        "start": {
+          "pdf_leaf": 183,
+          "char": 0
+        },
+        "end_exclusive": {
+          "pdf_leaf": 562,
+          "char": 0
+        }
+      },
+      "fragment_count": 379,
+      "characters": 892337,
+      "pages_path": "normalized/frank/nepostizhimoe/pages.jsonl",
+      "boundary_status": "located_in_pdf_text_layer_not_visually_checked",
+      "completeness": "continuous_span_in_supplied_scan_not_independent_edition_audit",
+      "verification_status": "not_checked",
+      "license_status": "rights_to_verify",
+      "runtime_import": false,
+      "editorial_footnotes": "not_separated_within_pages",
+      "primary_quote_ready": false
+    }
+  ],
+  "full_text_location": "external_local_directory_only",
+  "not_directly_ingestible": true
+}

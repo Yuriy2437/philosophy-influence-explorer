@@ -1,0 +1,117 @@
+{
+  "format": "corpus-acquisition-plan",
+  "prepared_on": "2026-11-22",
+  "not_a_download_receipt": true,
+  "items": [
+    {
+      "author": "frank",
+      "title": "Предмет знания",
+      "language": "ru",
+      "state": "not_acquired_in_this_batch",
+      "discovery_url": "https://azbyka.ru/otechnik/Semen_Frank/",
+      "edition_and_fulltext_url": "to_resolve",
+      "license_status": "rights_to_verify"
+    },
+    {
+      "author": "frank",
+      "title": "Душа человека",
+      "language": "ru",
+      "state": "not_acquired_in_this_batch",
+      "discovery_url": "https://azbyka.ru/otechnik/Semen_Frank/",
+      "edition_and_fulltext_url": "to_resolve",
+      "license_status": "rights_to_verify"
+    },
+    {
+      "author": "frank",
+      "title": "Реальность и человек",
+      "language": "ru",
+      "state": "not_acquired_in_this_batch",
+      "discovery_url": "https://azbyka.ru/otechnik/Semen_Frank/",
+      "edition_and_fulltext_url": "to_resolve",
+      "license_status": "rights_to_verify"
+    },
+    {
+      "author": "frank",
+      "title": "С нами Бог",
+      "language": "ru",
+      "state": "not_acquired_in_this_batch",
+      "discovery_url": "https://azbyka.ru/otechnik/Semen_Frank/",
+      "edition_and_fulltext_url": "to_resolve",
+      "license_status": "rights_to_verify"
+    },
+    {
+      "author": "frank",
+      "title": "Духовные основы общества",
+      "language": "ru",
+      "state": "not_acquired_in_this_batch",
+      "discovery_url": "https://azbyka.ru/otechnik/Semen_Frank/",
+      "edition_and_fulltext_url": "to_resolve",
+      "license_status": "rights_to_verify"
+    },
+    {
+      "author": "frank",
+      "title": "Смысл жизни",
+      "language": "ru",
+      "state": "not_acquired_in_this_batch",
+      "discovery_url": "https://azbyka.ru/otechnik/Semen_Frank/",
+      "edition_and_fulltext_url": "to_resolve",
+      "license_status": "rights_to_verify"
+    },
+    {
+      "author": "frank",
+      "title": "Свет во тьме",
+      "language": "ru",
+      "state": "not_acquired_in_this_batch",
+      "discovery_url": "https://azbyka.ru/otechnik/Semen_Frank/",
+      "edition_and_fulltext_url": "to_resolve",
+      "license_status": "rights_to_verify"
+    },
+    {
+      "author": "cusanus",
+      "scope": "Latin counterparts of works in staging catalog",
+      "language": "la",
+      "state": "not_acquired_in_this_batch",
+      "discovery_url": "https://cusanus-portal.de/",
+      "bulk_access_and_reuse": "to_resolve"
+    },
+    {
+      "author": "cusanus",
+      "scope": "German and English parallel translations",
+      "languages": [
+        "de",
+        "en"
+      ],
+      "state": "not_acquired_in_this_batch",
+      "discovery_url": "https://cusanus-portal.de/",
+      "translation_edition_and_reuse": "to_resolve"
+    },
+    {
+      "author": "palamas",
+      "title": "Триады",
+      "language": "ru",
+      "state": "not_acquired_in_this_batch",
+      "discovery_url": "https://azbyka.ru/otechnik/Grigorij_Palama/triady-v-zashhitu-svjashhenno-bezmolvstvujushhih/",
+      "translator_and_edition": "to_verify",
+      "completeness_target": "all_nine_treatises"
+    },
+    {
+      "author": "palamas",
+      "title": "Triads, critical Greek text and French translation",
+      "languages": [
+        "grc",
+        "fr"
+      ],
+      "state": "source_copy_not_acquired",
+      "edition_candidate": "Jean Meyendorff, Défense des saints hésychastes",
+      "completeness_target": "all_nine_treatises"
+    },
+    {
+      "author": "palamas",
+      "title": "The Triads, Nicholas Gendle translation",
+      "language": "en",
+      "state": "not_acquired_in_this_batch",
+      "scope_warning": "anthology_not_complete_translation",
+      "use": "optional_partial_parallel_reference"
+    }
+  ]
+}
